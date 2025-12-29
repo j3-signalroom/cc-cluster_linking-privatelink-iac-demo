@@ -52,3 +52,8 @@ variable "number_of_api_keys_to_retain" {
         error_message = "Number of API keys to retain, `number_of_api_keys_to_retain`, must be greater than or equal to 2."
     }
 }
+
+variable "confluent_base_path" {
+    description = "The base path in AWS Secrets Manager to store the Confluent Cloud API keys."
+    type        = string
+}

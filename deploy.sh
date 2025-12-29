@@ -97,6 +97,9 @@ aws sso login $AWS_PROFILE
 eval $(aws2-wrap $AWS_PROFILE --export)
 export AWS_REGION=$(aws configure get region $AWS_PROFILE)
 
+# Confluent Root Path
+confluent_secret_root_path=/confluent_cloud_resource/cc_sandbox_cluster_sharing
+
 # Create terraform.tfvars file
 if [ "$create_action" = true ]
 then
@@ -106,6 +109,7 @@ then
     \naws_session_token=\"${AWS_SESSION_TOKEN}\"\
     \nconfluent_api_key=\"${confluent_api_key}\"\
     \nconfluent_api_secret=\"${confluent_api_secret}\"\
+    \nconfluent_base_path=\"${confluent_secret_root_path}\"\
     \nday_count=${day_count}" > terraform.tfvars
 else
     printf "aws_region=\"${AWS_REGION}\"\
@@ -113,7 +117,8 @@ else
     \naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
     \naws_session_token=\"${AWS_SESSION_TOKEN}\"\
     \nconfluent_api_key=\"${confluent_api_key}\"\
-    \nconfluent_api_secret=\"${confluent_api_secret}\"" > terraform.tfvars
+    \nconfluent_api_secret=\"${confluent_api_secret}\"\
+    \nconfluent_secret_root_path=\"${confluent_secret_root_path}\"" > terraform.tfvars
 fi
 
 # Initialize the Terraform configuration
@@ -130,9 +135,6 @@ then
 else
     # Destroy the Terraform configuration
     terraform destroy -var-file=terraform.tfvars
-
-    # Confluent Base Path
-    confluent_base_path=/confluent_cloud_resource/cc_sandbox_cluster_sharing
 
     # Force the delete of the AWS Secrets
     aws secretsmanager delete-secret --secret-id ${confluent_base_path}/schema_registry_cluster/python_client --force-delete-without-recovery || true
