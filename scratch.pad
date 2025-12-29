@@ -1,0 +1,5 @@
+# Create
+./deploy.sh create --profile=AdministratorAccess-211125543747 --confluent-api-key=XQGVARHR347CG4WU --confluent-api-secret=cfltuWXv6AaWcuQNppECi1/qukLA+n8o8vgNu9b/KOuvS2+/9drvzxcvFN2yr+fA --snowflake-warehouse=COMPUTE_WH --admin-service-user-secrets-root-path=/snowflake_admin_service_user_credentials --day-count=30
+
+# Destroy
+./deploy.sh delete --profile=AdministratorAccess-211125543747 --confluent-api-key=XQGVARHR347CG4WU --confluent-api-secret=cfltuWXv6AaWcuQNppECi1/qukLA+n8o8vgNu9b/KOuvS2+/9drvzxcvFN2yr+fA --snowflake-warehouse=COMPUTE_WH --admin-service-user-secrets-root-path=/snowflake_admin_service_user_credentials 
