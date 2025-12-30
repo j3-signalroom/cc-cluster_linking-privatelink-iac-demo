@@ -98,7 +98,7 @@ eval $(aws2-wrap $AWS_PROFILE --export)
 export AWS_REGION=$(aws configure get region $AWS_PROFILE)
 
 # Confluent Root Path
-confluent_secret_root_path=/confluent_cloud_resource/cc_sandbox_cluster_sharing
+confluent_secret_root_path=/confluent_cloud_resource/cc_cluster_linking_demo
 
 # Create terraform.tfvars file
 if [ "$create_action" = true ]

@@ -7,7 +7,7 @@ resource "confluent_kafka_cluster" "source_cluster" {
   standard     {}
 
   environment {
-    id = confluent_environment.sandbox_cluster_sharing.id
+    id = confluent_environment.cluster_linking_demo.id
   }
 }
 
@@ -50,7 +50,7 @@ module "kafka_app_manager_api_key" {
     kind        = confluent_kafka_cluster.source_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox_cluster_sharing.id
+      id = confluent_environment.cluster_linking_demo.id
     }
   }
 
@@ -102,7 +102,7 @@ module "kafka_app_consumer_api_key" {
     kind        = confluent_kafka_cluster.source_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox_cluster_sharing.id
+      id = confluent_environment.cluster_linking_demo.id
     }
   }
 
@@ -154,7 +154,7 @@ module "kafka_app_producer_api_key" {
     kind        = confluent_kafka_cluster.source_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox_cluster_sharing.id
+      id = confluent_environment.cluster_linking_demo.id
     }
   }
 
@@ -173,7 +173,7 @@ resource "confluent_kafka_acl" "app_consumer_read_on_group" {
     id = confluent_kafka_cluster.source_cluster.id
   }
   resource_type = "GROUP"
-  resource_name = "sandbox_cluster_sharing"
+  resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.app_consumer.id}"
   host          = "*"
@@ -250,7 +250,7 @@ resource "confluent_kafka_acl" "app_connector_create_on_data_preview_topics" {
     id = confluent_kafka_cluster.source_cluster.id
   }
   resource_type = "TOPIC"
-  resource_name = "sandbox_cluster_sharing"
+  resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.app_connector.id}"
   host          = "*"
@@ -268,7 +268,7 @@ resource "confluent_kafka_acl" "app_connector_write_on_data_preview_topics" {
     id = confluent_kafka_cluster.source_cluster.id
   }
   resource_type = "TOPIC"
-  resource_name = "sandbox_cluster_sharing"
+  resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.app_connector.id}"
   host          = "*"
@@ -283,7 +283,7 @@ resource "confluent_kafka_acl" "app_connector_write_on_data_preview_topics" {
 
 resource "confluent_connector" "source" {
   environment {
-    id = confluent_environment.sandbox_cluster_sharing.id
+    id = confluent_environment.cluster_linking_demo.id
   }
   kafka_cluster {
     id = confluent_kafka_cluster.source_cluster.id

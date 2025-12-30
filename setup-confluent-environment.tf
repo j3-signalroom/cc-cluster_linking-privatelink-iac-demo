@@ -1,5 +1,5 @@
-resource "confluent_environment" "sandbox_cluster_sharing" {
-  display_name = "sandbox_cluster_sharing"
+resource "confluent_environment" "cluster_linking_demo" {
+  display_name = "cluster_linking_demo"
 
   stream_governance {
     package = "ESSENTIALS"

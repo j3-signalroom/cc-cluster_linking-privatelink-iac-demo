@@ -1,6 +1,6 @@
 # Create the Service Account for the Kafka Cluster API
 resource "confluent_service_account" "schema_registry_cluster_api" {
-    display_name = "sandbox_cluster_sharing_schema_registry_cluster_api"
+    display_name = "cluster_linking_demo_schema_registry_cluster_api"
     description  = "Sandbox Cluster Sharing Schema Registry Cluster API Service Account"
 }
 
