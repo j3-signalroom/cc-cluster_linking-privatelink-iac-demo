@@ -64,7 +64,7 @@ module "kafka_source_app_manager_api_key" {
 }
 
 # Create the `stock_trades` Kafka topic
-resource "confluent_kafka_topic" "stock_trades" {
+resource "confluent_kafka_topic" "source_stock_trades" {
   kafka_cluster {
     id = confluent_kafka_cluster.source.id
   }
@@ -120,7 +120,7 @@ resource "confluent_kafka_acl" "source_app_producer_write_on_topic" {
     id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.stock_trades.topic_name
+  resource_name = confluent_kafka_topic.source_stock_trades.topic_name
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.source_app_producer.id}"
   host          = "*"
@@ -191,7 +191,7 @@ resource "confluent_kafka_acl" "source_app_consumer_read_on_topic" {
     id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.stock_trades.topic_name
+  resource_name = confluent_kafka_topic.source_stock_trades.topic_name
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.source_app_consumer.id}"
   host          = "*"
@@ -206,7 +206,7 @@ resource "confluent_kafka_acl" "source_app_consumer_read_on_topic" {
 
 resource "confluent_service_account" "source_app_connector" {
   display_name = "source_app_connector"
-  description  = "Cluster Linking Demo Service account of DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster source"
+  description  = "DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster source"
 }
 
 resource "confluent_kafka_acl" "source_app_connector_describe_on_cluster" {
@@ -232,7 +232,7 @@ resource "confluent_kafka_acl" "source_app_connector_write_on_target_topic" {
     id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.stock_trades.topic_name
+  resource_name = confluent_kafka_topic.source_stock_trades.topic_name
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.source_app_connector.id}"
   host          = "*"
@@ -296,7 +296,7 @@ resource "confluent_connector" "source" {
     "name"                     = "SampleSourceConnector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
     "kafka.service.account.id" = confluent_service_account.source_app_connector.id
-    "kafka.topic"              = confluent_kafka_topic.stock_trades.topic_name
+    "kafka.topic"              = confluent_kafka_topic.source_stock_trades.topic_name
     "output.data.format"       = "AVRO"
     "quickstart"               = "STOCK_TRADES"
     "tasks.max"                = "1"

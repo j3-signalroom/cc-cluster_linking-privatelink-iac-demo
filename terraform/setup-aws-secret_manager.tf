@@ -8,7 +8,7 @@ resource "aws_secretsmanager_secret_version" "schema_registry_cluster_api_key" {
     secret_id     = aws_secretsmanager_secret.schema_registry_cluster_api_key.id
     secret_string = jsonencode({"schema.registry.basic.auth.credentials.source": "USER_INFO",
                                 "schema.registry.basic.auth.user.info": "${module.schema_registry_cluster_api_key_rotation.active_api_key.id}:${module.schema_registry_cluster_api_key_rotation.active_api_key.secret}",
-                                "schema.registry.url": "${data.confluent_schema_registry_cluster.env.rest_endpoint}"})
+                                "schema.registry.url": "${data.confluent_schema_registry_cluster.cluster_linking_demo.rest_endpoint}"})
 }
 
 # Create the Kafka Cluster Secrets: API Key Pair, JAAS (Java Authentication and Authorization) representation
@@ -137,13 +137,13 @@ resource "aws_secretsmanager_secret_version" "kafka_destination_app_consumer_api
 
 # Create the Kafka Cluster Secrets: API Key Pair, JAAS (Java Authentication and Authorization) representation
 # for Java client, bootstrap server URI and REST endpoint
-resource "aws_secretsmanager_secret" "kafka_destination_app_destination_api_key_java_client" {
-    name = "${var.confluent_secret_root_path}/destination_cluster/app_destination/java_client"
+resource "aws_secretsmanager_secret" "kafka_destination_app_producer_api_key_java_client" {
+    name = "${var.confluent_secret_root_path}/destination_cluster/app_producer/java_client"
     description = "Kafka Cluster secrets for Java client"
 }
-resource "aws_secretsmanager_secret_version" "kafka_destination_app_destination_api_key_java_client" {
-    secret_id     = aws_secretsmanager_secret.kafka_destination_app_destination_api_key_java_client.id
-    secret_string = jsonencode({"sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username='${module.kafka_destination_app_destination_api_key.active_api_key.id}' password='${module.kafka_destination_app_destination_api_key.active_api_key.secret}';",
+resource "aws_secretsmanager_secret_version" "kafka_destination_app_producer_api_key_java_client" {
+    secret_id     = aws_secretsmanager_secret.kafka_destination_app_producer_api_key_java_client.id
+    secret_string = jsonencode({"sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username='${module.kafka_destination_app_producer_api_key.active_api_key.id}' password='${module.kafka_destination_app_producer_api_key.active_api_key.secret}';",
                                 "bootstrap.servers": replace(confluent_kafka_cluster.destination.bootstrap_endpoint, "SASL_SSL://", "")})
 }
 

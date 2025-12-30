@@ -73,7 +73,6 @@ secret.*
 *.secret
 .env
 .env.*
-!.env.example
 *.credentials
 credentials.*
 apikeys.*

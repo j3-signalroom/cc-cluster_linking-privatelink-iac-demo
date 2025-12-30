@@ -3,7 +3,7 @@ terraform {
       organization = "signalroom"
 
         workspaces {
-            name = "cc-sandbox-cluster-sharing"
+            name = "cc-cluster-linking-iac-demo"
         }
   }
 

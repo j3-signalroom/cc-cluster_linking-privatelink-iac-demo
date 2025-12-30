@@ -5,14 +5,10 @@ resource "confluent_service_account" "schema_registry_cluster_api" {
 }
 
 # Config the environment's schema registry
-data "confluent_schema_registry_cluster" "env" {
+data "confluent_schema_registry_cluster" "cluster_linking_demo" {
   environment {
-    id = confluent_environment.tableflow_kickstarter.id
+    id = confluent_environment.cluster_linking_demo.id
   }
-
-  depends_on = [
-    confluent_kafka_cluster.kafka_cluster
-  ]
 }
 
 # Create the Environment API Key Pairs, rotate them in accordance to a time schedule, and provide the current
@@ -29,12 +25,12 @@ module "schema_registry_cluster_api_key_rotation" {
     }
 
     resource = {
-        id          = data.confluent_schema_registry_cluster.env.id
-        api_version = data.confluent_schema_registry_cluster.env.api_version
-        kind        = data.confluent_schema_registry_cluster.env.kind
+        id          = data.confluent_schema_registry_cluster.cluster_linking_demo.id
+        api_version = data.confluent_schema_registry_cluster.cluster_linking_demo.api_version
+        kind        = data.confluent_schema_registry_cluster.cluster_linking_demo.kind
 
         environment = {
-            id = confluent_environment.tableflow_kickstarter.id
+            id = confluent_environment.cluster_linking_demo.id
         }
     }
 
@@ -50,21 +46,21 @@ module "schema_registry_cluster_api_key_rotation" {
 resource "confluent_role_binding" "schema_registry_developer_read_all_subjects" {
   principal   = "User:${confluent_service_account.schema_registry_cluster_api.id}"
   role_name   = "DeveloperRead"
-  crn_pattern = "${data.confluent_schema_registry_cluster.env.resource_name}/subject=*"
+  crn_pattern = "${data.confluent_schema_registry_cluster.cluster_linking_demo.resource_name}/subject=*"
 
   depends_on = [ 
     confluent_service_account.schema_registry_cluster_api,
-    data.confluent_schema_registry_cluster.env 
+    data.confluent_schema_registry_cluster.cluster_linking_demo
   ]
 }
 
 resource "confluent_role_binding" "schema_registry_developer_write_all_subjects" {
   principal   = "User:${confluent_service_account.schema_registry_cluster_api.id}"
   role_name   = "DeveloperWrite"
-  crn_pattern = "${data.confluent_schema_registry_cluster.env.resource_name}/subject=*"
+  crn_pattern = "${data.confluent_schema_registry_cluster.cluster_linking_demo.resource_name}/subject=*"
 
   depends_on = [ 
     confluent_service_account.schema_registry_cluster_api,
-    data.confluent_schema_registry_cluster.env 
+    data.confluent_schema_registry_cluster.cluster_linking_demo
   ]
 }
