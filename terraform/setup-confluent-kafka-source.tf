@@ -206,7 +206,7 @@ resource "confluent_kafka_acl" "source_app_consumer_read_on_topic" {
 
 resource "confluent_service_account" "source_app_connector" {
   display_name = "source_app_connector"
-  description  = "Cluster Linking Demo Service account of DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster source"
+  description  = "DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster source"
 }
 
 resource "confluent_kafka_acl" "source_app_connector_describe_on_cluster" {
