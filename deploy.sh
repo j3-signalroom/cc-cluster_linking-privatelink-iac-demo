@@ -141,4 +141,7 @@ else
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_manager/python_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_consumer/python_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_producer/python_client --force-delete-without-recovery || true
+    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_manager/python_client --force-delete-without-recovery || true
+    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_consumer/python_client --force-delete-without-recovery || true
+    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_producer/python_client --force-delete-without-recovery || true
 fi
