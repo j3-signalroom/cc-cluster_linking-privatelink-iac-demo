@@ -1,6 +1,6 @@
 # Create the Kafka cluster
-resource "confluent_kafka_cluster" "source_cluster" {
-  display_name = "source_cluster"
+resource "confluent_kafka_cluster" "source" {
+  display_name = "source"
   availability = "SINGLE_ZONE"
   cloud        = local.cloud
   region       = var.aws_region
@@ -11,43 +11,43 @@ resource "confluent_kafka_cluster" "source_cluster" {
   }
 }
 
-# 'app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
-# to 'app_producer' and 'app_consumer' service accounts.
-resource "confluent_service_account" "app_manager" {
-  display_name = "source_cluster_app_manager"
-  description  = "Sandbox Cluster Sharing Service account to manage Kafka cluster"
+# 'source_app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
+# to 'source_app_producer' and 'source_app_consumer' service accounts.
+resource "confluent_service_account" "source_app_manager" {
+  display_name = "source_app_manager"
+  description  = "Cluster Linking Demo Service account to manage Kafka cluster source"
 
   depends_on = [ 
-    confluent_kafka_cluster.source_cluster 
+    confluent_kafka_cluster.source 
   ]
 }
 
-resource "confluent_role_binding" "app_manager_kafka_cluster_admin" {
-  principal   = "User:${confluent_service_account.app_manager.id}"
+resource "confluent_role_binding" "source_app_manager_kafka_cluster_admin" {
+  principal   = "User:${confluent_service_account.source_app_manager.id}"
   role_name   = "CloudClusterAdmin"
-  crn_pattern = confluent_kafka_cluster.source_cluster.rbac_crn
+  crn_pattern = confluent_kafka_cluster.source.rbac_crn
 
   depends_on = [ 
-    confluent_service_account.app_manager 
+    confluent_service_account.source_app_manager 
   ]
 }
 
-# Creates the app_manager Kafka Cluster API Key Pairs, rotate them in accordance to a time schedule,
+# Creates the source_app_manager Kafka Cluster API Key Pairs, rotate them in accordance to a time schedule,
 # and provide the current acitve API Key Pair to use
-module "kafka_app_manager_api_key" {
+module "kafka_source_app_manager_api_key" {
   source = "github.com/j3-signalroom/iac-confluent-api_key_rotation-tf_module"
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_manager.id
-    api_version = confluent_service_account.app_manager.api_version
-    kind        = confluent_service_account.app_manager.kind
+    id          = confluent_service_account.source_app_manager.id
+    api_version = confluent_service_account.source_app_manager.api_version
+    kind        = confluent_service_account.source_app_manager.kind
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source_cluster.id
-    api_version = confluent_kafka_cluster.source_cluster.api_version
-    kind        = confluent_kafka_cluster.source_cluster.kind
+    id          = confluent_kafka_cluster.source.id
+    api_version = confluent_kafka_cluster.source.api_version
+    kind        = confluent_kafka_cluster.source.kind
 
     environment = {
       id = confluent_environment.cluster_linking_demo.id
@@ -66,40 +66,40 @@ module "kafka_app_manager_api_key" {
 # Create the `stock_trades` Kafka topic
 resource "confluent_kafka_topic" "stock_trades" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   topic_name    = "stock_trades"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 
   depends_on = [ 
-    confluent_role_binding.app_manager_kafka_cluster_admin,
-    module.kafka_app_manager_api_key 
+    confluent_role_binding.source_app_manager_kafka_cluster_admin,
+    module.kafka_source_app_manager_api_key 
   ]
 }
 
-resource "confluent_service_account" "app_consumer" {
-  display_name = "source_cluster_app_consumer"
-  description  = "Sandbox Cluster Sharing Service account to consume from 'stock_trades' topic of Kafka cluster"
+resource "confluent_service_account" "source_app_consumer" {
+  display_name = "source_app_consumer"
+  description  = "Cluster Linking Demo Service account to consume from 'stock_trades' topic of Kafka cluster source"
 }
 
-module "kafka_app_consumer_api_key" {
+module "kafka_source_app_consumer_api_key" {
   source = "github.com/j3-signalroom/iac-confluent-api_key_rotation-tf_module"
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_consumer.id
-    api_version = confluent_service_account.app_consumer.api_version
-    kind        = confluent_service_account.app_consumer.kind
+    id          = confluent_service_account.source_app_consumer.id
+    api_version = confluent_service_account.source_app_consumer.api_version
+    kind        = confluent_service_account.source_app_consumer.kind
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source_cluster.id
-    api_version = confluent_kafka_cluster.source_cluster.api_version
-    kind        = confluent_kafka_cluster.source_cluster.kind
+    id          = confluent_kafka_cluster.source.id
+    api_version = confluent_kafka_cluster.source.api_version
+    kind        = confluent_kafka_cluster.source.kind
 
     environment = {
       id = confluent_environment.cluster_linking_demo.id
@@ -115,43 +115,43 @@ module "kafka_app_consumer_api_key" {
   day_count                    = var.day_count
 }
 
-resource "confluent_kafka_acl" "app_producer_write_on_topic" {
+resource "confluent_kafka_acl" "source_app_producer_write_on_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_producer.id}"
+  principal     = "User:${confluent_service_account.source_app_producer.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_service_account" "app_producer" {
-  display_name = "source_cluster_app_producer"
-  description  = "Sandbox Cluster Sharing Service account to produce to 'stock_trades' topic of Kafka cluster"
+resource "confluent_service_account" "source_app_producer" {
+  display_name = "source_app_producer"
+  description  = "Cluster Linking Demo Service account to produce to 'stock_trades' topic of Kafka cluster source"
 }
 
-module "kafka_app_producer_api_key" {
+module "kafka_source_app_producer_api_key" {
   source = "github.com/j3-signalroom/iac-confluent-api_key_rotation-tf_module"
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_producer.id
-    api_version = confluent_service_account.app_producer.api_version
-    kind        = confluent_service_account.app_producer.kind
+    id          = confluent_service_account.source_app_producer.id
+    api_version = confluent_service_account.source_app_producer.api_version
+    kind        = confluent_service_account.source_app_producer.kind
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source_cluster.id
-    api_version = confluent_kafka_cluster.source_cluster.api_version
-    kind        = confluent_kafka_cluster.source_cluster.kind
+    id          = confluent_kafka_cluster.source.id
+    api_version = confluent_kafka_cluster.source.api_version
+    kind        = confluent_kafka_cluster.source.kind
 
     environment = {
       id = confluent_environment.cluster_linking_demo.id
@@ -168,116 +168,116 @@ module "kafka_app_producer_api_key" {
 }
 
 
-resource "confluent_kafka_acl" "app_consumer_read_on_group" {
+resource "confluent_kafka_acl" "source_app_consumer_read_on_group" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "GROUP"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_consumer.id}"
+  principal     = "User:${confluent_service_account.source_app_consumer.id}"
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_kafka_acl" "app_consumer_read_on_topic" {
+resource "confluent_kafka_acl" "source_app_consumer_read_on_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_consumer.id}"
+  principal     = "User:${confluent_service_account.source_app_consumer.id}"
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_service_account" "app_connector" {
-  display_name = "source_cluster_app_connector"
-  description  = "Sandbox Cluster Sharing Service account of DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster"
+resource "confluent_service_account" "source_app_connector" {
+  display_name = "source_app_connector"
+  description  = "Cluster Linking Demo Service account of DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster source"
 }
 
-resource "confluent_kafka_acl" "app_connector_describe_on_cluster" {
+resource "confluent_kafka_acl" "source_app_connector_describe_on_cluster" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "CLUSTER"
   resource_name = "kafka-cluster"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_app_connector.id}"
   host          = "*"
   operation     = "DESCRIBE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_kafka_acl" "app_connector_write_on_target_topic" {
+resource "confluent_kafka_acl" "source_app_connector_write_on_target_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_app_connector.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_kafka_acl" "app_connector_create_on_data_preview_topics" {
+resource "confluent_kafka_acl" "source_app_connector_create_on_data_preview_topics" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_app_connector.id}"
   host          = "*"
   operation     = "CREATE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
-resource "confluent_kafka_acl" "app_connector_write_on_data_preview_topics" {
+resource "confluent_kafka_acl" "source_app_connector_write_on_data_preview_topics" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_app_connector.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source_cluster.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
   credentials {
-    key    = module.kafka_app_manager_api_key.active_api_key.id
-    secret = module.kafka_app_manager_api_key.active_api_key.secret
+    key    = module.kafka_source_app_manager_api_key.active_api_key.id
+    secret = module.kafka_source_app_manager_api_key.active_api_key.secret
   }
 }
 
@@ -286,7 +286,7 @@ resource "confluent_connector" "source" {
     id = confluent_environment.cluster_linking_demo.id
   }
   kafka_cluster {
-    id = confluent_kafka_cluster.source_cluster.id
+    id = confluent_kafka_cluster.source.id
   }
 
   config_sensitive = {}
@@ -295,7 +295,7 @@ resource "confluent_connector" "source" {
     "connector.class"          = "DatagenSource"
     "name"                     = "SampleSourceConnector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
-    "kafka.service.account.id" = confluent_service_account.app_connector.id
+    "kafka.service.account.id" = confluent_service_account.source_app_connector.id
     "kafka.topic"              = confluent_kafka_topic.stock_trades.topic_name
     "output.data.format"       = "AVRO"
     "quickstart"               = "STOCK_TRADES"
@@ -303,9 +303,9 @@ resource "confluent_connector" "source" {
   }
 
   depends_on = [
-    confluent_kafka_acl.app_connector_describe_on_cluster,
-    confluent_kafka_acl.app_connector_write_on_target_topic,
-    confluent_kafka_acl.app_connector_create_on_data_preview_topics,
-    confluent_kafka_acl.app_connector_write_on_data_preview_topics,
+    confluent_kafka_acl.source_app_connector_describe_on_cluster,
+    confluent_kafka_acl.source_app_connector_write_on_target_topic,
+    confluent_kafka_acl.source_app_connector_create_on_data_preview_topics,
+    confluent_kafka_acl.source_app_connector_write_on_data_preview_topics,
   ]
 }

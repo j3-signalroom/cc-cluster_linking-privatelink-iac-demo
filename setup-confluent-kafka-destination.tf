@@ -11,9 +11,9 @@ resource "confluent_kafka_cluster" "source_cluster" {
   }
 }
 
-# 'app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
-# to 'app_producer' and 'app_consumer' service accounts.
-resource "confluent_service_account" "app_manager" {
+# 'source_cluster_app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
+# to 'source_cluster_app_producer' and 'source_cluster_app_consumer' service accounts.
+resource "confluent_service_account" "source_cluster_app_manager" {
   display_name = "source_cluster_app_manager"
   description  = "Sandbox Cluster Sharing Service account to manage Kafka cluster"
 
@@ -23,25 +23,25 @@ resource "confluent_service_account" "app_manager" {
 }
 
 resource "confluent_role_binding" "app_manager_kafka_cluster_admin" {
-  principal   = "User:${confluent_service_account.app_manager.id}"
+  principal   = "User:${confluent_service_account.source_cluster_app_manager.id}"
   role_name   = "CloudClusterAdmin"
   crn_pattern = confluent_kafka_cluster.source_cluster.rbac_crn
 
   depends_on = [ 
-    confluent_service_account.app_manager 
+    confluent_service_account.source_cluster_app_manager 
   ]
 }
 
-# Creates the app_manager Kafka Cluster API Key Pairs, rotate them in accordance to a time schedule,
+# Creates the source_cluster_app_manager Kafka Cluster API Key Pairs, rotate them in accordance to a time schedule,
 # and provide the current acitve API Key Pair to use
 module "kafka_app_manager_api_key" {
   source = "github.com/j3-signalroom/iac-confluent-api_key_rotation-tf_module"
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_manager.id
-    api_version = confluent_service_account.app_manager.api_version
-    kind        = confluent_service_account.app_manager.kind
+    id          = confluent_service_account.source_cluster_app_manager.id
+    api_version = confluent_service_account.source_cluster_app_manager.api_version
+    kind        = confluent_service_account.source_cluster_app_manager.kind
   }
 
   resource = {
@@ -81,7 +81,7 @@ resource "confluent_kafka_topic" "stock_trades" {
   ]
 }
 
-resource "confluent_service_account" "app_consumer" {
+resource "confluent_service_account" "source_cluster_app_consumer" {
   display_name = "source_cluster_app_consumer"
   description  = "Sandbox Cluster Sharing Service account to consume from 'stock_trades' topic of Kafka cluster"
 }
@@ -91,9 +91,9 @@ module "kafka_app_consumer_api_key" {
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_consumer.id
-    api_version = confluent_service_account.app_consumer.api_version
-    kind        = confluent_service_account.app_consumer.kind
+    id          = confluent_service_account.source_cluster_app_consumer.id
+    api_version = confluent_service_account.source_cluster_app_consumer.api_version
+    kind        = confluent_service_account.source_cluster_app_consumer.kind
   }
 
   resource = {
@@ -122,7 +122,7 @@ resource "confluent_kafka_acl" "app_producer_write_on_topic" {
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_producer.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_producer.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
@@ -133,7 +133,7 @@ resource "confluent_kafka_acl" "app_producer_write_on_topic" {
   }
 }
 
-resource "confluent_service_account" "app_producer" {
+resource "confluent_service_account" "source_cluster_app_producer" {
   display_name = "source_cluster_app_producer"
   description  = "Sandbox Cluster Sharing Service account to produce to 'stock_trades' topic of Kafka cluster"
 }
@@ -143,9 +143,9 @@ module "kafka_app_producer_api_key" {
 
   #Required Input(s)
   owner = {
-    id          = confluent_service_account.app_producer.id
-    api_version = confluent_service_account.app_producer.api_version
-    kind        = confluent_service_account.app_producer.kind
+    id          = confluent_service_account.source_cluster_app_producer.id
+    api_version = confluent_service_account.source_cluster_app_producer.api_version
+    kind        = confluent_service_account.source_cluster_app_producer.kind
   }
 
   resource = {
@@ -175,7 +175,7 @@ resource "confluent_kafka_acl" "app_consumer_read_on_group" {
   resource_type = "GROUP"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_consumer.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_consumer.id}"
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
@@ -193,7 +193,7 @@ resource "confluent_kafka_acl" "app_consumer_read_on_topic" {
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_consumer.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_consumer.id}"
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
@@ -204,7 +204,7 @@ resource "confluent_kafka_acl" "app_consumer_read_on_topic" {
   }
 }
 
-resource "confluent_service_account" "app_connector" {
+resource "confluent_service_account" "source_cluster_app_connector" {
   display_name = "source_cluster_app_connector"
   description  = "Sandbox Cluster Sharing Service account of DataGen Source Connector to produce to the 'stock_trades' topic of the Kafka cluster"
 }
@@ -216,7 +216,7 @@ resource "confluent_kafka_acl" "app_connector_describe_on_cluster" {
   resource_type = "CLUSTER"
   resource_name = "kafka-cluster"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_connector.id}"
   host          = "*"
   operation     = "DESCRIBE"
   permission    = "ALLOW"
@@ -234,7 +234,7 @@ resource "confluent_kafka_acl" "app_connector_write_on_target_topic" {
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.stock_trades.topic_name
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_connector.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
@@ -252,7 +252,7 @@ resource "confluent_kafka_acl" "app_connector_create_on_data_preview_topics" {
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_connector.id}"
   host          = "*"
   operation     = "CREATE"
   permission    = "ALLOW"
@@ -270,7 +270,7 @@ resource "confluent_kafka_acl" "app_connector_write_on_data_preview_topics" {
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
   pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.app_connector.id}"
+  principal     = "User:${confluent_service_account.source_cluster_app_connector.id}"
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
@@ -295,7 +295,7 @@ resource "confluent_connector" "source" {
     "connector.class"          = "DatagenSource"
     "name"                     = "SampleSourceConnector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
-    "kafka.service.account.id" = confluent_service_account.app_connector.id
+    "kafka.service.account.id" = confluent_service_account.source_cluster_app_connector.id
     "kafka.topic"              = confluent_kafka_topic.stock_trades.topic_name
     "output.data.format"       = "AVRO"
     "quickstart"               = "STOCK_TRADES"

@@ -18,10 +18,10 @@ resource "aws_secretsmanager_secret" "kafka_app_manager_cluster_api_key" {
     description = "Kafka Cluster secrets for Python client"
 }
 
-resource "aws_secretsmanager_secret_version" "kafka_app_manager_cluster_api_key" {
-    secret_id     = aws_secretsmanager_secret.kafka_app_manager_cluster_api_key.id
-    secret_string = jsonencode({"sasl.username": "${module.kafka_app_manager_api_key.active_api_key.id}",
-                                "sasl.password": "${module.kafka_app_manager_api_key.active_api_key.secret}",
+resource "aws_secretsmanager_secret_version" "kafka_source_app_manager_cluster_api_key" {
+    secret_id     = aws_secretsmanager_secret.kafka_source_app_manager_cluster_api_key.id
+    secret_string = jsonencode({"sasl.username": "${module.kafka_source_app_manager_api_key.active_api_key.id}",
+                                "sasl.password": "${module.kafka_source_app_manager_api_key.active_api_key.secret}",
                                 "bootstrap.servers": replace(confluent_kafka_cluster.source_cluster.bootstrap_endpoint, "SASL_SSL://", "")})
 }
 
@@ -30,10 +30,10 @@ resource "aws_secretsmanager_secret" "kafka_app_consumer_api_key" {
     description = "Kafka Cluster secrets for Python client"
 }
 
-resource "aws_secretsmanager_secret_version" "kafka_app_consumer_api_key" {
-    secret_id     = aws_secretsmanager_secret.kafka_app_consumer_api_key.id
-    secret_string = jsonencode({"sasl.username": "${module.kafka_app_consumer_api_key.active_api_key.id}",
-                                "sasl.password": "${module.kafka_app_consumer_api_key.active_api_key.secret}",
+resource "aws_secretsmanager_secret_version" "kafka_source_app_consumer_api_key" {
+    secret_id     = aws_secretsmanager_secret.kafka_source_app_consumer_api_key.id
+    secret_string = jsonencode({"sasl.username": "${module.kafka_source_app_consumer_api_key.active_api_key.id}",
+                                "sasl.password": "${module.kafka_source_app_consumer_api_key.active_api_key.secret}",
                                 "bootstrap.servers": replace(confluent_kafka_cluster.source_cluster.bootstrap_endpoint, "SASL_SSL://", "")})
 }
 
@@ -42,9 +42,9 @@ resource "aws_secretsmanager_secret" "kafka_app_producer_api_key" {
     description = "Kafka Cluster secrets for Python client"
 }
 
-resource "aws_secretsmanager_secret_version" "kafka_app_producer_api_key" {
-    secret_id     = aws_secretsmanager_secret.kafka_app_producer_api_key.id
-    secret_string = jsonencode({"sasl.username": "${module.kafka_app_producer_api_key.active_api_key.id}",
-                                "sasl.password": "${module.kafka_app_producer_api_key.active_api_key.secret}",
+resource "aws_secretsmanager_secret_version" "kafka_source_app_producer_api_key" {
+    secret_id     = aws_secretsmanager_secret.kafka_source_app_producer_api_key.id
+    secret_string = jsonencode({"sasl.username": "${module.kafka_source_app_producer_api_key.active_api_key.id}",
+                                "sasl.password": "${module.kafka_source_app_producer_api_key.active_api_key.secret}",
                                 "bootstrap.servers": replace(confluent_kafka_cluster.source_cluster.bootstrap_endpoint, "SASL_SSL://", "")})
 }
