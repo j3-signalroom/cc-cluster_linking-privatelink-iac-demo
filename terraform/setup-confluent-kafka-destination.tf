@@ -63,24 +63,6 @@ module "kafka_destination_app_manager_api_key" {
   day_count                    = var.day_count
 }
 
-# Create the `stock_trades` Kafka topic
-resource "confluent_kafka_topic" "destination_stock_trades" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.destination.id
-  }
-  topic_name    = "stock_trades"
-  rest_endpoint = confluent_kafka_cluster.destination.rest_endpoint
-  credentials {
-    key    = module.kafka_destination_app_manager_api_key.active_api_key.id
-    secret = module.kafka_destination_app_manager_api_key.active_api_key.secret
-  }
-
-  depends_on = [ 
-    confluent_role_binding.destination_app_manager_kafka_cluster_admin,
-    module.kafka_destination_app_manager_api_key 
-  ]
-}
-
 resource "confluent_service_account" "destination_app_consumer" {
   display_name = "destination_app_consumer"
   description  = "Cluster Linking Demo Service account to consume from 'stock_trades' topic of Kafka cluster destination"
@@ -115,23 +97,23 @@ module "kafka_destination_app_consumer_api_key" {
   day_count                    = var.day_count
 }
 
-resource "confluent_kafka_acl" "destination_app_producer_write_on_topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.destination.id
-  }
-  resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.destination_stock_trades.topic_name
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.destination_app_producer.id}"
-  host          = "*"
-  operation     = "WRITE"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.destination.rest_endpoint
-  credentials {
-    key    = module.kafka_destination_app_manager_api_key.active_api_key.id
-    secret = module.kafka_destination_app_manager_api_key.active_api_key.secret
-  }
-}
+# resource "confluent_kafka_acl" "destination_app_producer_write_on_topic" {
+#   kafka_cluster {
+#     id = confluent_kafka_cluster.destination.id
+#   }
+#   resource_type = "TOPIC"
+#   resource_name = confluent_kafka_topic.destination_stock_trades.topic_name
+#   pattern_type  = "LITERAL"
+#   principal     = "User:${confluent_service_account.destination_app_producer.id}"
+#   host          = "*"
+#   operation     = "WRITE"
+#   permission    = "ALLOW"
+#   rest_endpoint = confluent_kafka_cluster.destination.rest_endpoint
+#   credentials {
+#     key    = module.kafka_destination_app_manager_api_key.active_api_key.id
+#     secret = module.kafka_destination_app_manager_api_key.active_api_key.secret
+#   }
+# }
 
 resource "confluent_service_account" "destination_app_producer" {
   display_name = "destination_app_producer"
@@ -186,20 +168,20 @@ resource "confluent_kafka_acl" "destination_app_consumer_read_on_group" {
   }
 }
 
-resource "confluent_kafka_acl" "destination_app_consumer_read_on_topic" {
-  kafka_cluster {
-    id = confluent_kafka_cluster.destination.id
-  }
-  resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.destination_stock_trades.topic_name
-  pattern_type  = "LITERAL"
-  principal     = "User:${confluent_service_account.destination_app_consumer.id}"
-  host          = "*"
-  operation     = "READ"
-  permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.destination.rest_endpoint
-  credentials {
-    key    = module.kafka_destination_app_manager_api_key.active_api_key.id
-    secret = module.kafka_destination_app_manager_api_key.active_api_key.secret
-  }
-}
+# resource "confluent_kafka_acl" "destination_app_consumer_read_on_topic" {
+#   kafka_cluster {
+#     id = confluent_kafka_cluster.destination.id
+#   }
+#   resource_type = "TOPIC"
+#   resource_name = confluent_kafka_topic.destination_stock_trades.topic_name
+#   pattern_type  = "LITERAL"
+#   principal     = "User:${confluent_service_account.destination_app_consumer.id}"
+#   host          = "*"
+#   operation     = "READ"
+#   permission    = "ALLOW"
+#   rest_endpoint = confluent_kafka_cluster.destination.rest_endpoint
+#   credentials {
+#     key    = module.kafka_destination_app_manager_api_key.active_api_key.id
+#     secret = module.kafka_destination_app_manager_api_key.active_api_key.secret
+#   }
+# }
