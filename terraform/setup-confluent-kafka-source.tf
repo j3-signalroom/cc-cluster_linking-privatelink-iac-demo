@@ -293,7 +293,7 @@ resource "confluent_connector" "source" {
 
   config_nonsensitive = {
     "connector.class"          = "DatagenSource"
-    "name"                     = "SampleSourceConnector"
+    "name"                     = "cluster_linking_demo_source_datagen_connector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
     "kafka.service.account.id" = confluent_service_account.source_app_connector.id
     "kafka.topic"              = confluent_kafka_topic.source_stock_trades.topic_name

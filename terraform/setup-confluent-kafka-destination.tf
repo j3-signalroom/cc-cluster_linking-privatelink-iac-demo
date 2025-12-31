@@ -1,11 +1,11 @@
 # Create the Kafka cluster
 resource "confluent_kafka_cluster" "destination" {
   display_name = "destination"
-  availability = "SINGLE_ZONE"
+  availability = "HIGH"
   cloud        = local.cloud
   region       = var.aws_region
   enterprise   {}
-
+  
   environment {
     id = confluent_environment.cluster_linking_demo.id
   }
