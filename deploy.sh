@@ -203,13 +203,8 @@ undeploy_infrastructure() {
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_manager/java_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_consumer/java_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_producer/java_client --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_manager/python_client --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_consumer/python_client --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/source_cluster/app_producer/python_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_manager/java_client --force-delete-without-recovery || true
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_consumer/java_client --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_manager/python_client --force-delete-without-recovery || true
-    aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_consumer/python_client --force-delete-without-recovery || true
     
     print_info "Infrastructure destroyed successfully!"
     cd ..
