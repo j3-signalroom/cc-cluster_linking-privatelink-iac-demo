@@ -51,7 +51,7 @@ case $1 in
     echo
     echo "(Error Message 001)  You did not specify one of the commands: create | destroy."
     echo
-    echo "Usage:  Require all five arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all three arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
     ;;
@@ -86,7 +86,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -97,7 +97,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
     echo
-    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -108,7 +108,7 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -135,16 +135,16 @@ deploy_infrastructure() {
     
     cd "$TERRAFORM_DIR"
     
-    # Create terraform.tfvars file
-    printf "aws_region=\"${AWS_REGION}\"\
-    \naws_access_key_id=\"${AWS_ACCESS_KEY_ID}\"\
-    \naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
-    \naws_session_token=\"${AWS_SESSION_TOKEN}\"\
-    \nconfluent_api_key=\"${confluent_api_key}\"\
-    \nconfluent_api_secret=\"${confluent_api_secret}\"\
-    \nconfluent_secret_root_path=\"${confluent_secret_root_path}\"\
-    \nday_count=${day_count}" > terraform.tfvars
-    
+    # Export AWS credentials, Confluent credentials and optional variables as environment variables
+    export TF_VAR_aws_region="${AWS_REGION}"
+    export TF_VAR_aws_access_key_id="${AWS_ACCESS_KEY_ID}"
+    export TF_VAR_aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}"
+    export TF_VAR_aws_session_token="${AWS_SESSION_TOKEN}"
+    export TF_VAR_confluent_api_key="${confluent_api_key}"
+    export TF_VAR_confluent_api_secret="${confluent_api_secret}"
+    export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
+    export TF_VAR_day_count="${day_count}"
+
     # Initialize Terraform if needed
     if ! check_terraform_init; then
         print_info "Initializing Terraform..."
@@ -184,14 +184,14 @@ undeploy_infrastructure() {
         terraform init
     fi
     
-    # Create terraform.tfvars file
-    printf "aws_region=\"${AWS_REGION}\"\
-    \naws_access_key_id=\"${AWS_ACCESS_KEY_ID}\"\
-    \naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
-    \naws_session_token=\"${AWS_SESSION_TOKEN}\"\
-    \nconfluent_api_key=\"${confluent_api_key}\"\
-    \nconfluent_api_secret=\"${confluent_api_secret}\"\
-    \nconfluent_secret_root_path=\"${confluent_secret_root_path}\"" > terraform.tfvars
+    # Export AWS credentials, Confluent credentials and optional variables as environment variables
+    export TF_VAR_aws_region="${AWS_REGION}"
+    export TF_VAR_aws_access_key_id="${AWS_ACCESS_KEY_ID}"
+    export TF_VAR_aws_secret_access_key="${AWS_SECRET_ACCESS_KEY}"
+    export TF_VAR_aws_session_token="${AWS_SESSION_TOKEN}"
+    export TF_VAR_confluent_api_key="${confluent_api_key}"
+    export TF_VAR_confluent_api_secret="${confluent_api_secret}"
+    export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
 
     # Destroy
     print_info "Running Terraform destroy..."
@@ -212,6 +212,7 @@ undeploy_infrastructure() {
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/destination_cluster/app_consumer/python_client --force-delete-without-recovery || true
     
     print_info "Infrastructure destroyed successfully!"
+    cd ..
 }   
 
 # Main execution flow
