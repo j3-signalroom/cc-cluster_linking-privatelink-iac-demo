@@ -57,6 +57,11 @@ case $1 in
     ;;
 esac
 
+# Default required variables
+AWS_PROFILE=""
+confluent_api_key=""
+confluent_api_secret=""
+
 # Default optional variables
 day_count=30
 
@@ -81,7 +86,7 @@ do
 done
 
 # Check required --profile argument was supplied
-if [ -z $AWS_PROFILE ]
+if [ -z "$AWS_PROFILE" ]
 then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
@@ -92,7 +97,7 @@ then
 fi
 
 # Check required --confluent-api-key argument was supplied
-if [ -z $confluent_api_key ]
+if [ -z "$confluent_api_key" ]
 then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
@@ -103,7 +108,7 @@ then
 fi
 
 # Check required --confluent-api-secret argument was supplied
-if [ -z $confluent_api_secret ]
+if [ -z "$confluent_api_secret" ]
 then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
