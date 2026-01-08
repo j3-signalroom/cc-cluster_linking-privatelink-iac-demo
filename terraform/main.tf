@@ -3,7 +3,7 @@ terraform {
       organization = "signalroom"
 
         workspaces {
-            name = "cc-cluster-linking-iac-demo"
+            name = "cc-cluster-linking-privatelink-iac-demo"
         }
     }
 
