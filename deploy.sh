@@ -5,8 +5,8 @@
 # ./deploy.sh=<create | destroy> --profile=<SSO_PROFILE_NAME>
 #                                --confluent-api-key=<CONFLUENT_API_KEY>
 #                                --confluent-api-secret=<CONFLUENT_API_SECRET>
-#                                [--vpc-id=<VPC_ID>]
-#                                [--subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>]
+#                                --vpc-id=<VPC_ID>
+#                                --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>
 #                                [--day-count=<DAY_COUNT>]
 #
 #
@@ -63,10 +63,10 @@ esac
 AWS_PROFILE=""
 confluent_api_key=""
 confluent_api_secret=""
-
-# Default optional variables
 vpc_id=""
 subnets_to_privatelink=""
+
+# Default optional variable(s)
 day_count=30
 
 # Get the arguments passed by shift to remove the first word
@@ -101,7 +101,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -112,7 +112,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
     echo 
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -123,25 +123,25 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
 # Check required --vpc-id argument was supplied
-if [ -z "$vpc_id" ] && [ "$create_action" = true ]
+if [ -z "$vpc_id" ]
 then
     echo
     echo "(Error Message 005)  You did not include the proper use of the --vpc-id=<VPC_ID> argument in the call."
     echo "$vpc_id"
     echo
-    echo "Usage:  Create command require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
 # Check required --subnets-to-privatelink argument was supplied
-if [ -z "$subnets_to_privatelink" ] && [ "$create_action" = true ]
+if [ -z "$subnets_to_privatelink" ]
 then
     echo
     echo "(Error Message 006)  You did not include the proper use of the --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK> argument in the call."
@@ -223,6 +223,8 @@ undeploy_infrastructure() {
     export TF_VAR_confluent_api_key="${confluent_api_key}"
     export TF_VAR_confluent_api_secret="${confluent_api_secret}"
     export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
+    export TF_VAR_vpc_id="${vpc_id}"
+    export TF_VAR_subnets_to_privatelink="${subnets_to_privatelink}"
 
     # Destroy
     print_info "Running Terraform destroy..."

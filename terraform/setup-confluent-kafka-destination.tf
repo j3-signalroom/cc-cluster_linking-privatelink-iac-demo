@@ -50,9 +50,6 @@ module "kafka_destination_app_manager_api_key" {
     environment = {
       id = confluent_environment.cluster_linking_demo.id
     }
-
-    # Add this to skip DNS-dependent validation
-    disable_wait_for_ready = true
   }
 
   confluent_api_key    = var.confluent_api_key
@@ -62,6 +59,7 @@ module "kafka_destination_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_role_binding.destination_app_manager_kafka_cluster_admin,
@@ -92,9 +90,6 @@ module "kafka_destination_app_consumer_api_key" {
     environment = {
       id = confluent_environment.cluster_linking_demo.id
     }
-
-    # Add this to skip DNS-dependent validation
-    disable_wait_for_ready = true
   }
 
   confluent_api_key    = var.confluent_api_key
@@ -104,6 +99,8 @@ module "kafka_destination_app_consumer_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  # Add this to skip DNS-dependent validation
+  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_private_link_attachment_connection.cluster_linking_demo
