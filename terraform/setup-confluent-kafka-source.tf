@@ -52,6 +52,9 @@ module "kafka_source_app_manager_api_key" {
     environment = {
       id = confluent_environment.cluster_linking_demo.id
     }
+
+    # Add this to skip DNS-dependent validation
+    disable_wait_for_ready = true
   }
 
   confluent_api_key    = var.confluent_api_key

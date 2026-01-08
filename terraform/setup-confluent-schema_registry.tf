@@ -4,11 +4,21 @@ resource "confluent_service_account" "schema_registry_cluster_api" {
     description  = "Sandbox Cluster Sharing Schema Registry Cluster API Service Account"
 }
 
-# Config the environment's schema registry
-data "confluent_schema_registry_cluster" "cluster_linking_demo" {
+resource "confluent_schema_registry_cluster" "cluster_linking_demo" {
+  package = "ESSENTIALS"
+  
   environment {
     id = confluent_environment.cluster_linking_demo.id
   }
+
+  region {
+    id = var.aws_region
+  }
+
+  # Wait for PrivateLink connection
+  depends_on = [
+    confluent_private_link_attachment_connection.cluster_linking_demo
+  ]
 }
 
 # Create the Environment API Key Pairs, rotate them in accordance to a time schedule, and provide the current
