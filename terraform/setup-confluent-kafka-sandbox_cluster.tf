@@ -7,7 +7,7 @@ availability = "HIGH"
   enterprise   {}
   
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
 }
 
@@ -45,12 +45,12 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source.id
-    api_version = confluent_kafka_cluster.source.api_version
-    kind        = confluent_kafka_cluster.source.kind
+    id          = confluent_kafka_cluster.sandbox_cluster.id
+    api_version = confluent_kafka_cluster.sandbox_cluster.api_version
+    kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.cluster_linking_demo.id
+      id = confluent_environment.non_prod.id
     }
 
     # Add this to skip DNS-dependent validation
@@ -75,10 +75,10 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
 # Create the `stock_trades` Kafka topic
 resource "confluent_kafka_topic" "source_stock_trades" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   topic_name    = "stock_trades"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -106,12 +106,12 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source.id
-    api_version = confluent_kafka_cluster.source.api_version
-    kind        = confluent_kafka_cluster.source.kind
+    id          = confluent_kafka_cluster.sandbox_cluster.id
+    api_version = confluent_kafka_cluster.sandbox_cluster.api_version
+    kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.cluster_linking_demo.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -131,7 +131,7 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_producer_write_on_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.source_stock_trades.topic_name
@@ -140,7 +140,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_producer_write_on_topic" {
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -163,12 +163,12 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
   }
 
   resource = {
-    id          = confluent_kafka_cluster.source.id
-    api_version = confluent_kafka_cluster.source.api_version
-    kind        = confluent_kafka_cluster.source.kind
+    id          = confluent_kafka_cluster.sandbox_cluster.id
+    api_version = confluent_kafka_cluster.sandbox_cluster.api_version
+    kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.cluster_linking_demo.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -189,7 +189,7 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "GROUP"
   resource_name = "cluster_linking_demo"
@@ -198,7 +198,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -207,7 +207,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.source_stock_trades.topic_name
@@ -216,7 +216,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_topic" {
   host          = "*"
   operation     = "READ"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -230,7 +230,7 @@ resource "confluent_service_account" "sandbox_cluster_app_connector" {
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_describe_on_cluster" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "CLUSTER"
   resource_name = "kafka-cluster"
@@ -239,7 +239,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_describe_on_cluste
   host          = "*"
   operation     = "DESCRIBE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -248,7 +248,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_describe_on_cluste
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_topic" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
   resource_name = confluent_kafka_topic.source_stock_trades.topic_name
@@ -257,7 +257,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_to
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -266,7 +266,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_to
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_preview_topics" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
@@ -275,7 +275,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_pre
   host          = "*"
   operation     = "CREATE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -284,7 +284,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_pre
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_preview_topics" {
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
   resource_name = "cluster_linking_demo"
@@ -293,7 +293,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
   host          = "*"
   operation     = "WRITE"
   permission    = "ALLOW"
-  rest_endpoint = confluent_kafka_cluster.source.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -302,10 +302,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
 
 resource "confluent_connector" "source" {
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
   kafka_cluster {
-    id = confluent_kafka_cluster.source.id
+    id = confluent_kafka_cluster.sandbox_cluster.id
   }
 
   config_sensitive = {}

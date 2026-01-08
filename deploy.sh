@@ -5,6 +5,8 @@
 # ./deploy.sh=<create | destroy> --profile=<SSO_PROFILE_NAME>
 #                                --confluent-api-key=<CONFLUENT_API_KEY>
 #                                --confluent-api-secret=<CONFLUENT_API_SECRET>
+#                                --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID>
+#                                --sandbox-cluster-subnets-to-privatelink=<SANDBOX_CLUSTER_SUBNETS_TO_PRIVATELINK>
 #                                --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID>
 #                                --shared-cluster-subnets-to-privatelink=<SHARED_CLUSTER_SUBNETS_TO_PRIVATELINK>
 #                                [--day-count=<DAY_COUNT>]
@@ -89,13 +91,13 @@ do
             arg_length=25
             sandbox_cluster_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--sandbox-cluster-subnets-to-privatelink="*)
-            arg_length=36
+            arg_length=41
             sandbox_cluster_subnets_to_privatelink=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--shared-cluster-vpc-id="*)
             arg_length=24
             shared_cluster_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--shared-cluster-subnets-to-privatelink="*)
-            arg_length=35
+            arg_length=40
             shared_cluster_subnets_to_privatelink=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--day-count="*)
             arg_length=12

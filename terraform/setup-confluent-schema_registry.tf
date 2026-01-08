@@ -7,11 +7,12 @@ resource "confluent_service_account" "schema_registry_cluster_api" {
 # Config the environment's schema registry
 data "confluent_schema_registry_cluster" "cluster_linking_demo" {
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
 
   depends_on = [
-    confluent_private_link_attachment.cluster_linking_demo
+    confluent_private_link_attachment.sandbox_cluster,
+    confluent_private_link_attachment.shared_cluster
   ]
 }
 
@@ -34,7 +35,7 @@ module "schema_registry_cluster_api_key_rotation" {
         kind        = data.confluent_schema_registry_cluster.cluster_linking_demo.kind
 
         environment = {
-            id = confluent_environment.cluster_linking_demo.id
+            id = confluent_environment.non_prod.id
         }
     }
 

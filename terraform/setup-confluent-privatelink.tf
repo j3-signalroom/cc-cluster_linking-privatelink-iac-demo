@@ -3,7 +3,7 @@ resource "confluent_private_link_attachment" "sandbox_cluster" {
   region = var.aws_region
   display_name = "sandbox-cluster-aws-platt"
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
 }
 
@@ -18,7 +18,7 @@ module "sandbox_cluster_privatelink" {
 resource "confluent_private_link_attachment_connection" "sandbox_cluster" {
   display_name = "sandbox-cluster-aws-plattc"
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
   aws {
     vpc_endpoint_id = module.sandbox_cluster_privatelink.vpc_endpoint_id
@@ -34,7 +34,7 @@ resource "confluent_private_link_attachment" "shared_cluster" {
   region = var.aws_region
   display_name = "shared-cluster-aws-platt"
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
 }
 
@@ -49,7 +49,7 @@ module "shared_cluster_privatelink" {
 resource "confluent_private_link_attachment_connection" "shared_cluster" {
   display_name = "shared-cluster-aws-plattc"
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
   aws {
     vpc_endpoint_id = module.shared_cluster_privatelink.vpc_endpoint_id

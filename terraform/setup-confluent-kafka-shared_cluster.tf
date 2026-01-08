@@ -7,7 +7,7 @@ resource "confluent_kafka_cluster" "shared_cluster" {
   enterprise   {}
   
   environment {
-    id = confluent_environment.cluster_linking_demo.id
+    id = confluent_environment.non_prod.id
   }
 }
 
@@ -48,7 +48,7 @@ module "kafka_shared_cluster_app_manager_api_key" {
     kind        = confluent_kafka_cluster.shared_cluster.kind
 
     environment = {
-      id = confluent_environment.cluster_linking_demo.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -88,7 +88,7 @@ module "kafka_shared_cluster_app_consumer_api_key" {
     kind        = confluent_kafka_cluster.shared_cluster.kind
 
     environment = {
-      id = confluent_environment.cluster_linking_demo.id
+      id = confluent_environment.non_prod.id
     }
   }
 
