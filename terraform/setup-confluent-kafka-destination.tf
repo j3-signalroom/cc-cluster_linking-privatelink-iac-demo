@@ -11,15 +11,6 @@ resource "confluent_kafka_cluster" "destination" {
   }
 }
 
-resource "confluent_private_link_attachment" "destination" {
-  display_name = "aws-privatelink-gateway"
-  cloud        = local.cloud
-  region       = var.aws_region
-  environment {
-    id = confluent_environment.cluster_linking_demo.id
-  }
-}
-
 resource "confluent_service_account" "destination_app_manager" {
   display_name = "destination_app_manager"
   description  = "Sandbox Cluster Sharing Service account to manage Kafka cluster"
@@ -68,6 +59,12 @@ module "kafka_destination_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  disable_wait_for_ready       = true
+
+  depends_on = [
+    confluent_role_binding.destination_app_manager_kafka_cluster_admin,
+    confluent_private_link_attachment_connection.cluster_linking_demo
+  ]
 }
 
 resource "confluent_service_account" "destination_app_consumer" {
@@ -102,6 +99,12 @@ module "kafka_destination_app_consumer_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  # Add this to skip DNS-dependent validation
+  disable_wait_for_ready       = true
+
+  depends_on = [
+    confluent_private_link_attachment_connection.cluster_linking_demo
+  ]
 }
 
 resource "confluent_kafka_acl" "destination_app_consumer_read_on_group" {
@@ -109,7 +112,7 @@ resource "confluent_kafka_acl" "destination_app_consumer_read_on_group" {
     id = confluent_kafka_cluster.destination.id
   }
   resource_type = "GROUP"
-  resource_name = "cluster_linking_demo"
+  resource_name = "cluster_linking_demo_"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.destination_app_consumer.id}"
   host          = "*"

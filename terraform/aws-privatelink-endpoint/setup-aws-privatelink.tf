@@ -1,16 +1,3 @@
-data "aws_vpc" "privatelink" {
-  id = var.vpc_id
-}
-
-data "aws_availability_zone" "privatelink" {
-  for_each = var.subnets_to_privatelink
-  zone_id = each.key
-}
-
-locals {
-  network_id = split(".", var.dns_domain)[0]
-}
-
 resource "aws_security_group" "privatelink" {
   # Ensure that SG is unique, so that this module can be used multiple times within a single VPC
   name = "ccloud-privatelink_${local.network_id}_${var.vpc_id}"
@@ -94,8 +81,4 @@ resource "aws_route53_record" "privatelink-zonal" {
       replace(aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"], local.endpoint_prefix, "")
     )
   ]
-}
-
-output "vpc_endpoint_id" {
-  value = aws_vpc_endpoint.privatelink.id
 }

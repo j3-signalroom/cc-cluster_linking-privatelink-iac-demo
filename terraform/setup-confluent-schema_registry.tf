@@ -9,6 +9,10 @@ data "confluent_schema_registry_cluster" "cluster_linking_demo" {
   environment {
     id = confluent_environment.cluster_linking_demo.id
   }
+
+  depends_on = [
+    confluent_private_link_attachment.cluster_linking_demo
+  ]
 }
 
 # Create the Environment API Key Pairs, rotate them in accordance to a time schedule, and provide the current

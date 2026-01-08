@@ -57,3 +57,13 @@ variable "confluent_secret_root_path" {
     description = "The root path in AWS Secrets Manager to store the Confluent Cloud Resource API keys."
     type        = string
 }
+
+variable "vpc_id" {
+  description = "The ID of the VPC in which the endpoint will be used."
+  type        = string
+}
+
+variable "subnets_to_privatelink" {
+  description = "A map of Zone ID to Subnet ID (i.e.: {\"use1-az1\" = \"subnet-abcdef0123456789a\", ...})"
+  type        = map(string)
+}

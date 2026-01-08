@@ -5,6 +5,8 @@
 # ./deploy.sh=<create | destroy> --profile=<SSO_PROFILE_NAME>
 #                                --confluent-api-key=<CONFLUENT_API_KEY>
 #                                --confluent-api-secret=<CONFLUENT_API_SECRET>
+#                                --vpc-id=<VPC_ID>
+#                                --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>
 #                                [--day-count=<DAY_COUNT>]
 #
 #
@@ -61,8 +63,10 @@ esac
 AWS_PROFILE=""
 confluent_api_key=""
 confluent_api_secret=""
+vpc_id=""
+subnets_to_privatelink=""
 
-# Default optional variables
+# Default optional variable(s)
 day_count=30
 
 # Get the arguments passed by shift to remove the first word
@@ -79,6 +83,12 @@ do
         *"--confluent-api-secret="*)
             arg_length=23
             confluent_api_secret=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--vpc-id="*)
+            arg_length=9
+            vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--subnets-to-privatelink="*)
+            arg_length=25
+            subnets_to_privatelink=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--day-count="*)
             arg_length=12
             day_count=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -91,7 +101,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -101,8 +111,8 @@ if [ -z "$confluent_api_key" ]
 then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
-    echo
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo 
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -113,23 +123,39 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all three arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET>"
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
+# Check required --vpc-id argument was supplied
+if [ -z "$vpc_id" ]
+then
+    echo
+    echo "(Error Message 005)  You did not include the proper use of the --vpc-id=<VPC_ID> argument in the call."
+    echo "$vpc_id"
+    echo
+    echo "Usage:  Require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
+# Check required --subnets-to-privatelink argument was supplied
+if [ -z "$subnets_to_privatelink" ]
+then
+    echo
+    echo "(Error Message 006)  You did not include the proper use of the --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK> argument in the call."
+    echo
+    echo "Usage:  Create command require all five arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --vpc-id=<VPC_ID> --subnets-to-privatelink=<SUBNETS_TO_PRIVATELINK>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
 # Get the AWS SSO credential variables that are used by the AWS CLI commands to authenicate
+print_step "Authenticating to AWS SSO profile: $AWS_PROFILE..."
 aws sso login $AWS_PROFILE
 eval $(aws2-wrap $AWS_PROFILE --export)
 export AWS_REGION=$(aws configure get region $AWS_PROFILE)
-
-# Function to check if Terraform is initialized
-check_terraform_init() {
-    if [ ! -d "$TERRAFORM_DIR/.terraform" ]; then
-        return 1
-    fi
-    return 0
-}
 
 # Confluent Root Path
 confluent_secret_root_path=/confluent_cloud_resource/cc_cluster_linking_demo
@@ -149,12 +175,12 @@ deploy_infrastructure() {
     export TF_VAR_confluent_api_secret="${confluent_api_secret}"
     export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
     export TF_VAR_day_count="${day_count}"
+    export TF_VAR_vpc_id="${vpc_id}"
+    export TF_VAR_subnets_to_privatelink="${subnets_to_privatelink}"
 
     # Initialize Terraform if needed
-    if ! check_terraform_init; then
-        print_info "Initializing Terraform..."
-        terraform init
-    fi
+    print_info "Initializing Terraform..."
+    terraform init
     
     # Plan
     print_info "Running Terraform plan..."
@@ -197,6 +223,8 @@ undeploy_infrastructure() {
     export TF_VAR_confluent_api_key="${confluent_api_key}"
     export TF_VAR_confluent_api_secret="${confluent_api_secret}"
     export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
+    export TF_VAR_vpc_id="${vpc_id}"
+    export TF_VAR_subnets_to_privatelink="${subnets_to_privatelink}"
 
     # Destroy
     print_info "Running Terraform destroy..."
