@@ -22,7 +22,9 @@ resource "confluent_cluster_link" "sandbox-to-shared" {
   depends_on = [ 
     confluent_kafka_cluster.sandbox_cluster,
     module.kafka_sandbox_cluster_app_manager_api_key.active_api_key,
+    time_sleep.wait_for_sandbox_dns,
     confluent_kafka_cluster.shared_cluster,
-    module.kafka_shared_cluster_app_manager_api_key.active_api_key
+    module.kafka_shared_cluster_app_manager_api_key.active_api_key,
+    time_sleep.wait_for_shared_dns
   ]
 }

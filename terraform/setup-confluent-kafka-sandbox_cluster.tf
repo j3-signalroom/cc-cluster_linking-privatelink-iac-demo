@@ -11,6 +11,15 @@ availability = "HIGH"
   }
 }
 
+resource "time_sleep" "wait_for_sandbox_dns" {
+  depends_on = [
+    module.sandbox_cluster_privatelink,
+    confluent_private_link_attachment_connection.sandbox_cluster,
+    confluent_kafka_cluster.sandbox_cluster
+  ]
+  create_duration = "90s"
+}
+
 # 'sandbox_cluster_app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
 # to 'sandbox_cluster_app_producer' and 'sandbox_cluster_app_consumer' service accounts.
 resource "confluent_service_account" "sandbox_cluster_app_manager" {
@@ -68,7 +77,8 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
 
   depends_on = [
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
-    confluent_private_link_attachment_connection.sandbox_cluster
+    confluent_private_link_attachment_connection.sandbox_cluster,
+    time_sleep.wait_for_sandbox_dns
   ]
 }
 
@@ -86,7 +96,8 @@ resource "confluent_kafka_topic" "source_stock_trades" {
 
   depends_on = [ 
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
-    module.kafka_sandbox_cluster_app_manager_api_key 
+    module.kafka_sandbox_cluster_app_manager_api_key,
+    time_sleep.wait_for_sandbox_dns
   ]
 }
 
@@ -125,7 +136,8 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
   disable_wait_for_ready       = true
 
   depends_on = [
-    confluent_private_link_attachment_connection.sandbox_cluster
+    confluent_private_link_attachment_connection.sandbox_cluster,
+    time_sleep.wait_for_sandbox_dns
   ]
 }
 
@@ -145,6 +157,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_producer_write_on_topic" {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_service_account" "sandbox_cluster_app_producer" {
@@ -182,10 +198,10 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
   disable_wait_for_ready       = true
 
   depends_on = [
-    confluent_private_link_attachment_connection.sandbox_cluster
+    confluent_private_link_attachment_connection.sandbox_cluster,
+    time_sleep.wait_for_sandbox_dns
   ]
 }
-
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
   kafka_cluster {
@@ -221,6 +237,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_topic" {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_service_account" "sandbox_cluster_app_connector" {
@@ -244,6 +264,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_describe_on_cluste
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_topic" {
@@ -262,6 +286,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_to
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_preview_topics" {
@@ -280,6 +308,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_pre
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_preview_topics" {
@@ -298,6 +330,10 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    time_sleep.wait_for_sandbox_dns
+  ]
 }
 
 resource "confluent_connector" "source" {
