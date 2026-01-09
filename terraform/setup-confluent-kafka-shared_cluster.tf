@@ -17,7 +17,7 @@ resource "time_sleep" "wait_for_shared_dns" {
     confluent_private_link_attachment_connection.shared_cluster,
     confluent_kafka_cluster.shared_cluster
   ]
-  create_duration = "90s"
+  create_duration = "5m"
 }
 
 resource "confluent_service_account" "shared_cluster_app_manager" {
@@ -135,6 +135,8 @@ resource "confluent_kafka_acl" "shared_cluster_app_consumer_read_on_group" {
   }
 
   depends_on = [
-    time_sleep.wait_for_shared_dns
+    confluent_private_link_attachment_connection.shared_cluster,
+    time_sleep.wait_for_shared_dns,
+    aws_route53_zone_association.shared_to_agent
   ]
 }

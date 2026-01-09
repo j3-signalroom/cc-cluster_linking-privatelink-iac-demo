@@ -76,3 +76,9 @@ variable "shared_cluster_subnets_to_privatelink" {
   description = "A map of Zone ID to Subnet ID (i.e.: {\"use1-az1\" = \"subnet-abcdef0123456789a\", ...})"
   type        = map(string)
 }
+
+variable "tfc_agent_subnet_id" {
+  description = "Subnet ID where the Terraform Cloud Agent is running (e.g., subnet-06c0d7c6a6800c500)"
+  type        = string
+  default     = "subnet-06c0d7c6a6800c500"
+}

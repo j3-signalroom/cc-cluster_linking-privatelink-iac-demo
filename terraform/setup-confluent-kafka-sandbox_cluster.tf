@@ -17,7 +17,7 @@ resource "time_sleep" "wait_for_sandbox_dns" {
     confluent_private_link_attachment_connection.sandbox_cluster,
     confluent_kafka_cluster.sandbox_cluster
   ]
-  create_duration = "90s"
+  create_duration = "5m"
 }
 
 # 'sandbox_cluster_app_manager' service account is required in this configuration to create 'stock_trades' topic and grant ACLs
@@ -78,7 +78,9 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
   depends_on = [
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
     confluent_private_link_attachment_connection.sandbox_cluster,
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    time_sleep.wait_for_shared_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -97,7 +99,8 @@ resource "confluent_kafka_topic" "source_stock_trades" {
   depends_on = [ 
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
     module.kafka_sandbox_cluster_app_manager_api_key,
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -137,7 +140,8 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
 
   depends_on = [
     confluent_private_link_attachment_connection.sandbox_cluster,
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -159,7 +163,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_producer_write_on_topic" {
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -199,7 +204,8 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
 
   depends_on = [
     confluent_private_link_attachment_connection.sandbox_cluster,
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -219,6 +225,12 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
   }
+
+  depends_on = [
+    confluent_private_link_attachment_connection.sandbox_cluster,
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
+  ]
 }
 
 resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_topic" {
@@ -239,7 +251,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_topic" {
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -266,7 +279,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_describe_on_cluste
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -288,7 +302,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_to
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -310,7 +325,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_pre
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
@@ -332,7 +348,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    aws_route53_zone_association.sandbox_to_agent
   ]
 }
 
