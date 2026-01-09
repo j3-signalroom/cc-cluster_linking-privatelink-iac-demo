@@ -247,10 +247,8 @@ undeploy_infrastructure() {
     cd "$TERRAFORM_DIR"
     
     # Initialize Terraform if needed
-    if ! check_terraform_init; then
-        print_info "Initializing Terraform..."
-        terraform init
-    fi
+    print_info "Initializing Terraform..."
+    terraform init
     
     # Export AWS credentials, Confluent credentials and optional variables as environment variables
     export TF_VAR_aws_region="${AWS_REGION}"
