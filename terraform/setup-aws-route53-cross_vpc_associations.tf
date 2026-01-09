@@ -36,7 +36,7 @@ resource "aws_route53_zone_association" "sandbox_to_shared" {
   vpc_id  = var.shared_cluster_vpc_id
 }
 
-# Add a time_sleep to wait for DNS association to propagate
+# Wait for DNS association to propagate
 resource "time_sleep" "wait_for_zone_associations" {
   depends_on = [
     aws_route53_zone_association.sandbox_to_agent,
@@ -45,5 +45,5 @@ resource "time_sleep" "wait_for_zone_associations" {
     aws_route53_zone_association.sandbox_to_shared
   ]
 
-  create_duration = "60s"
+  create_duration = "120s"  # 2 minutes for zone association propagation
 }

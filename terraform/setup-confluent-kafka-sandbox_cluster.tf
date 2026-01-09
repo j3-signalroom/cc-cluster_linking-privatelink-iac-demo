@@ -79,6 +79,7 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
     confluent_private_link_attachment_connection.sandbox_cluster,
     time_sleep.wait_for_sandbox_dns,
+    time_sleep.wait_for_shared_dns,
     aws_route53_zone_association.sandbox_to_agent
   ]
 }
