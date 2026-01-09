@@ -5,6 +5,7 @@ Below is the Terraform visualization of the infrastructure that will be created:
 
 ![terraform-visualization](docs/images/terraform-visualization.png)
 
+**Table of Contents**
 <!-- toc -->
 + [**1.0 Resources**](#10-resources)
 <!-- tocstop -->
