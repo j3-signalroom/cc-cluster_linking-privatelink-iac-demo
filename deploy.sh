@@ -227,6 +227,10 @@ deploy_infrastructure() {
         terraform apply tfplan
         rm tfplan
         print_info "Infrastructure deployed successfully!"
+
+        print_info "Creating the Terraform visualization..."
+        terraform graph | dot -Tpng > ../docs/images/terraform-visualization.png
+        print_info "Terraform visualization created at: ../docs/images/terraform-visualization.png"
         cd ..
         return 0
     else

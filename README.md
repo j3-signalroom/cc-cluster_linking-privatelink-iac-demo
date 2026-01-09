@@ -1,9 +1,14 @@
 # Confluent Cloud Infrastructure as Code (IaC) Cluster Linking with PrivateLink Demo
 This repository contains Terraform code to set up Confluent Cloud infrastructure with a focus on Cluster Linking using PrivateLink for secure connectivity.
 
+Below is the Terraform visualization of the infrastructure that will be created:
+
+![terraform-visualization](docs/images/terraform-visualization.png)
+
 <!-- toc -->
 + [**1.0 Resources**](#10-resources)
 <!-- tocstop -->
+
 
 ## **1.0 Resources**
 - [AWS PrivateLink Overview in Confluent Cloud](https://docs.confluent.io/cloud/current/networking/aws-privatelink-overview.html#aws-privatelink-overview-in-ccloud)
