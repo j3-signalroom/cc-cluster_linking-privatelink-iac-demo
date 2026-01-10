@@ -60,12 +60,6 @@ resource "aws_route53_zone" "privatelink" {
   }
 }
 
-locals {
-  # List of AZs where PrivateLink subnets exist
-  private_subnet_azs = [for s in data.aws_subnets.subnets_to_privatelink.ids : 
-                         data.aws_subnet.subnets_to_privatelink[s].availability_zone]
-}
-
 # Creates wildcard CNAME record for single-AZ PrivateLink endpoints
 resource "aws_route53_record" "privatelink" {
   count = length(data.aws_subnets.subnets_to_privatelink.ids) == 1 ? 0 : 1
@@ -78,11 +72,6 @@ resource "aws_route53_record" "privatelink" {
   ]
 }
 
-locals {
-  # Extracts prefix from PrivateLink DNS entry for constructing zonal records
-  endpoint_prefix = split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0]
-}
-
 # Creates wildcard CNAME records per AZ for multi-AZ PrivateLink endpoints
 resource "aws_route53_record" "privatelink-zonal" {
   for_each = toset(data.aws_subnets.subnets_to_privatelink.ids)
@@ -93,9 +82,13 @@ resource "aws_route53_record" "privatelink-zonal" {
   ttl  = "60"
   records = [
     format("%s-%s%s",
-      local.endpoint_prefix,
+      split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0],  # endpoint_prefix inlined
       data.aws_availability_zone.privatelink[each.key].name,
-      replace(aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"], local.endpoint_prefix, "")
+      replace(
+        aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"], 
+        split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0], 
+        ""
+      )
     )
   ]
 }
