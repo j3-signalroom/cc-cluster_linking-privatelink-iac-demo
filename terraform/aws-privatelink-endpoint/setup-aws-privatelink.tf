@@ -60,21 +60,30 @@ resource "aws_route53_zone" "privatelink" {
   }
 }
 
-# Creates wildcard CNAME record for single-AZ PrivateLink endpoints
+# Creates wildcard CNAME record for multi-AZ PrivateLink endpoints
 resource "aws_route53_record" "privatelink" {
   count = length(data.aws_subnets.subnets_to_privatelink.ids) == 1 ? 0 : 1
+  
+  depends_on = [aws_vpc_endpoint.privatelink]
+  
   zone_id = aws_route53_zone.privatelink.zone_id
   name = "*.${aws_route53_zone.privatelink.name}"
   type = "CNAME"
   ttl  = "60"
   records = [
-    aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"]
+    try(aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"], "")
   ]
+  
+  lifecycle {
+    ignore_changes = [records]
+  }
 }
 
 # Creates wildcard CNAME records per AZ for multi-AZ PrivateLink endpoints
 resource "aws_route53_record" "privatelink-zonal" {
   for_each = toset(data.aws_subnets.subnets_to_privatelink.ids)
+  
+  depends_on = [aws_vpc_endpoint.privatelink]
 
   zone_id = aws_route53_zone.privatelink.zone_id
   name = length(data.aws_subnets.subnets_to_privatelink.ids) == 1 ? "*" : "*.${data.aws_availability_zone.privatelink[each.key].zone_id}"
@@ -82,15 +91,19 @@ resource "aws_route53_record" "privatelink-zonal" {
   ttl  = "60"
   records = [
     format("%s-%s%s",
-      split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0],  # endpoint_prefix inlined
+      try(split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0], "vpce-temp"),
       data.aws_availability_zone.privatelink[each.key].name,
-      replace(
+      try(replace(
         aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"], 
         split(".", aws_vpc_endpoint.privatelink.dns_entry[0]["dns_name"])[0], 
         ""
-      )
+      ), ".vpce-svc-temp.us-east-1.vpce.amazonaws.com")
     )
   ]
+  
+  lifecycle {
+    ignore_changes = [records]
+  }
 }
 
 # Associate VPC associated with privatelink Route 53 Private Hosted Zone with TFC Agent VPC
