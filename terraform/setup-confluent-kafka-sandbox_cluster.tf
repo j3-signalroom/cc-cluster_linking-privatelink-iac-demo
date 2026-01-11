@@ -14,7 +14,7 @@ availability = "HIGH"
 resource "time_sleep" "wait_for_sandbox_dns" {
   depends_on = [
     module.sandbox_cluster_privatelink,
-    confluent_private_link_attachment_connection.non_prod,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
     confluent_kafka_cluster.sandbox_cluster
   ]
   create_duration = "3m"
@@ -73,9 +73,8 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
 
   depends_on = [
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
-    confluent_private_link_attachment_connection.non_prod,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
     time_sleep.wait_for_sandbox_dns,
-    time_sleep.wait_for_shared_dns
   ]
 }
 
@@ -133,7 +132,7 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
 
 
   depends_on = [
-    confluent_private_link_attachment_connection.non_prod,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
     time_sleep.wait_for_sandbox_dns
   ]
 }
@@ -194,7 +193,7 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
   day_count                    = var.day_count
 
   depends_on = [
-    confluent_private_link_attachment_connection.non_prod,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
     time_sleep.wait_for_sandbox_dns
   ]
 }
@@ -217,7 +216,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
   }
 
   depends_on = [
-    confluent_private_link_attachment_connection.non_prod,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
     time_sleep.wait_for_sandbox_dns
   ]
 }

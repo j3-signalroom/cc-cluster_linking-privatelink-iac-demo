@@ -11,8 +11,7 @@ data "confluent_schema_registry_cluster" "cluster_linking_demo" {
   }
 
   depends_on = [
-    confluent_private_link_attachment.sandbox_cluster,
-    confluent_private_link_attachment.shared_cluster
+    confluent_private_link_attachment.non_prod
   ]
 }
 
