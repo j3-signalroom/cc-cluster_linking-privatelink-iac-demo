@@ -38,5 +38,5 @@ output "security_group_id" {
 
 output "tfc_agent_association_created" {
   description = "Whether TFC Agent VPC association was created"
-  value       = var.associate_with_tfc_agent_vpc && var.tfc_agent_vpc_id != null && var.tfc_agent_vpc_id != var.vpc_id_to_privatelink
+  value       = var.associate_with_tfc_agent_vpc && var.tfc_agent_vpc_id != null && var.tfc_agent_vpc_id != var.vpc_id
 }

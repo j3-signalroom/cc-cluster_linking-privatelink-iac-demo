@@ -1,13 +1,17 @@
 # Create the Kafka cluster
 resource "confluent_kafka_cluster" "sandbox_cluster" {
   display_name = "sandbox_cluster"
-availability = "HIGH"
+  availability = "HIGH"
   cloud        = local.cloud
   region       = var.aws_region
   enterprise   {}
   
   environment {
     id = confluent_environment.non_prod.id
+  }
+
+  network {
+    id = confluent_network.non_prod.id  # This makes it use PrivateLink
   }
 }
 
@@ -70,6 +74,7 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_role_binding.sandbox_cluster_app_manager_kafka_cluster_admin,
@@ -129,7 +134,7 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
-
+  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_private_link_attachment_connection.sandbox_cluster_plattc,
@@ -191,6 +196,7 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
+  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_private_link_attachment_connection.sandbox_cluster_plattc,

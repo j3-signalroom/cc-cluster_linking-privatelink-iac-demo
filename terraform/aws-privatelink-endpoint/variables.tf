@@ -7,21 +7,16 @@ variable "privatelink_service_name" {
 }
 
 variable "dns_domain" {
-  description = "DNS domain from Confluent Private Link Attachment (e.g., n-abc123.us-east-1.aws.private.confluent.cloud). CRITICAL: Must be exact domain name."
+  description = "DNS domain from Confluent Private Link Attachment (e.g., us-east-1.aws.private.confluent.cloud). CRITICAL: Must be exact domain name."
   type        = string
-  
-  validation {
-    condition     = can(regex("^n-[a-z0-9]+\\.[a-z0-9-]+\\.aws\\.private\\.confluent\\.cloud$", var.dns_domain))
-    error_message = "DNS domain must be in format: n-<network-id>.<region>.aws.private.confluent.cloud"
-  }
 }
 
-variable "vpc_id_to_privatelink" {
+variable "vpc_id" {
   description = "VPC ID where the VPC endpoint will be created"
   type        = string
   
   validation {
-    condition     = can(regex("^vpc-[a-f0-9]+$", var.vpc_id_to_privatelink))
+    condition     = can(regex("^vpc-[a-f0-9]+$", var.vpc_id))
     error_message = "VPC ID must be valid format (vpc-xxxxxxxxx)"
   }
 }
@@ -29,16 +24,6 @@ variable "vpc_id_to_privatelink" {
 variable "subnet_ids" {
   description = "List of subnet IDs for the VPC endpoint (one per AZ for high availability). Use private subnets in different availability zones."
   type        = list(string)
-  
-  validation {
-    condition     = length(var.subnet_ids) > 0 && length(var.subnet_ids) <= 6
-    error_message = "Must provide at least 1 subnet, maximum 6 subnets"
-  }
-  
-  validation {
-    condition     = alltrue([for id in var.subnet_ids : can(regex("^subnet-[a-f0-9]+$", id))])
-    error_message = "All subnet IDs must be valid format (subnet-xxxxxxxxx)"
-  }
 }
 
 variable "tfc_agent_vpc_id" {

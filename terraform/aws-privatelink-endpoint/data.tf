@@ -4,7 +4,7 @@ locals {
 
 # Get VPC details
 data "aws_vpc" "privatelink" {
-  id = var.vpc_id_to_privatelink
+  id = var.vpc_id
 }
 
 # Get subnet details for each provided subnet

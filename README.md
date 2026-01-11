@@ -1,6 +1,8 @@
 # Confluent Cloud Infrastructure as Code (IaC) Cluster Linking with PrivateLink Demo
 This repository provides production-grade Terraform infrastructure-as-code that models a multi-network Confluent Cloud deployment, demonstrating secure PrivateLink connectivity from a single Confluent Cloud environment to multiple AWS VPCs. It further showcases in-region Cluster Linking between two Confluent Cloud Kafka clusters, enabling low-latency, private, and fully managed inter-cluster data replication without public network exposure.
 
+![cc-cluster_linking-privatelinking-iac-demo](docs/images/cc-cluster_linking-privatelinking-iac-demo.png)
+
 Below is the Terraform resource visualization of the infrastructure that's created:
 
 ![terraform-visualization](docs/images/terraform-visualization.png)

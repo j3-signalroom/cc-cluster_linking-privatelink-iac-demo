@@ -9,9 +9,9 @@
 #                                --confluent-api-key=<CONFLUENT_API_KEY>
 #                                --confluent-api-secret=<CONFLUENT_API_SECRET>
 #                                --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>
-#                                --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK>
+#                                --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID>
 #                                --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS>
-#                                --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK>
+#                                --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID>
 #                                --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS>
 #                                [--day-count=<DAY_COUNT>]
 #
@@ -59,7 +59,7 @@ case $1 in
     echo
     echo "(Error Message 001)  You did not specify one of the commands: create | destroy."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
     ;;
@@ -70,9 +70,9 @@ AWS_PROFILE=""
 confluent_api_key=""
 confluent_api_secret=""
 tfc_agent_vpc_id=""
-sandbox_cluster_vpc_id_to_privatelink=""
+sandbox_cluster_vpc_id=""
 sandbox_cluster_subnet_ids=""
-shared_cluster_vpc_id_to_privatelink=""
+shared_cluster_vpc_id=""
 shared_cluster_subnet_ids=""
 
 # Default optional variable(s)
@@ -92,17 +92,17 @@ do
         *"--confluent-api-secret="*)
             arg_length=23
             confluent_api_secret=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--sandbox-cluster-vpc-id-to-privatelink="*)
-            arg_length=40
-            sandbox_cluster_vpc_id_to_privatelink=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--sandbox-cluster-vpc-id="*)
+            arg_length=25
+            sandbox_cluster_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--sandbox-cluster-subnet-ids="*)
-            arg_length=28
+            arg_length=29
             sandbox_cluster_subnet_ids=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--shared-cluster-vpc-id-to-privatelink="*)
-            arg_length=39
-            shared_cluster_vpc_id_to_privatelink=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--shared-cluster-vpc-id="*)
+            arg_length=24
+            shared_cluster_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--shared-cluster-subnet-ids="*)
-            arg_length=27
+            arg_length=28
             shared_cluster_subnet_ids=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--tfc-agent-vpc-id="*)
             arg_length=19
@@ -119,7 +119,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -130,7 +130,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -141,18 +141,18 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --sandbox-cluster-vpc-id-to-privatelink argument was supplied
-if [ -z "$sandbox_cluster_vpc_id_to_privatelink" ]
+# Check required --sandbox-cluster-vpc-id argument was supplied
+if [ -z "$sandbox_cluster_vpc_id" ]
 then
     echo
-    echo "(Error Message 005)  You did not include the proper use of the --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> argument in the call."
+    echo "(Error Message 005)  You did not include the proper use of the --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -163,18 +163,18 @@ then
     echo
     echo "(Error Message 006)  You did not include the proper use of the --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --shared-cluster-vpc-id-to-privatelink argument was supplied
-if [ -z "$shared_cluster_vpc_id_to_privatelink" ]
+# Check required --shared-cluster-vpc-id argument was supplied
+if [ -z "$shared_cluster_vpc_id" ]
 then
     echo
-    echo "(Error Message 007)  You did not include the proper use of the --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> argument in the call."
+    echo "(Error Message 007)  You did not include the proper use of the --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -185,7 +185,7 @@ then
     echo
     echo "(Error Message 008)  You did not include the proper use of the --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -196,7 +196,7 @@ then
     echo
     echo "(Error Message 009)  You did not include the proper use of the --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id-to-privatelink=<SANDBOX_CLUSTER_VPC_ID_TO_PRIVATELINK> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id-to-privatelink=<SHARED_CLUSTER_VPC_ID_TO_PRIVATELINK> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -225,10 +225,10 @@ deploy_infrastructure() {
     export TF_VAR_confluent_api_secret="${confluent_api_secret}"
     export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
     export TF_VAR_day_count="${day_count}"
-    export TF_VAR_sandbox_cluster_vpc_id_to_privatelink="${sandbox_cluster_vpc_id_to_privatelink}"
-    export TF_VAR_sandbox_cluster_subnet_ids='('"${sandbox_cluster_subnet_ids//,/ }"')'
-    export TF_VAR_shared_cluster_vpc_id_to_privatelink="${shared_cluster_vpc_id_to_privatelink}"
-    export TF_VAR_shared_cluster_subnet_ids='('"${shared_cluster_subnet_ids//,/ }"')'
+    export TF_VAR_sandbox_cluster_vpc_id="${sandbox_cluster_vpc_id}"
+    export TF_VAR_sandbox_cluster_subnet_ids=${sandbox_cluster_subnet_ids}
+    export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
+    export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
     export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
 
     # Initialize Terraform if needed
@@ -278,10 +278,10 @@ undeploy_infrastructure() {
     export TF_VAR_confluent_api_key="${confluent_api_key}"
     export TF_VAR_confluent_api_secret="${confluent_api_secret}"
     export TF_VAR_confluent_secret_root_path="${confluent_secret_root_path}"
-    export TF_VAR_sandbox_cluster_vpc_id_to_privatelink="${sandbox_cluster_vpc_id_to_privatelink}"
-    export TF_VAR_sandbox_cluster_subnet_ids='('"${sandbox_cluster_subnet_ids//,/ }"')'
-    export TF_VAR_shared_cluster_vpc_id_to_privatelink="${shared_cluster_vpc_id_to_privatelink}"
-    export TF_VAR_shared_cluster_subnet_ids='('"${shared_cluster_subnet_ids//,/ }"')'
+    export TF_VAR_sandbox_cluster_vpc_id="${sandbox_cluster_vpc_id}"
+    export TF_VAR_sandbox_cluster_subnet_ids=${sandbox_cluster_subnet_ids}
+    export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
+    export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
     export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
 
     # Destroy

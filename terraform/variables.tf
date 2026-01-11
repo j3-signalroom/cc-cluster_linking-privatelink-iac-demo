@@ -58,24 +58,24 @@ variable "confluent_secret_root_path" {
     type        = string
 }
 
-variable "sandbox_cluster_vpc_id_to_privatelink" {
+variable "sandbox_cluster_vpc_id" {
   description = "The VPC ID used for the PrivateLink endpoint for the Sandbox Kafka Cluster."
   type        = string
 }
 
 variable "sandbox_cluster_subnet_ids" {
   description = "The Subnet IDs used for the PrivateLink endpoint for the Sandbox Kafka Cluster."
-  type        = list(string)
+  type        = string
 }
 
-variable "shared_cluster_vpc_id_to_privatelink" {
+variable "shared_cluster_vpc_id" {
   description = "The VPC ID used for the PrivateLink endpoint for the Shared Kafka Cluster."
   type        = string
 }
 
 variable "shared_cluster_subnet_ids" {
   description = "The Subnet IDs used for the PrivateLink endpoint for the Shared Kafka Cluster."
-  type        = list(string)
+  type        = string
 }
 
 variable "tfc_agent_vpc_id" {

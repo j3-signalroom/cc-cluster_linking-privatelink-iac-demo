@@ -1,6 +1,6 @@
 # Security Group for VPC Endpoint
 resource "aws_security_group" "privatelink" {
-  name        = "ccloud-privatelink_${local.network_id}_${var.vpc_id_to_privatelink}"
+  name        = "ccloud-privatelink_${local.network_id}_${var.vpc_id}"
   description = "Confluent Cloud Private Link security group for ${var.dns_domain}"
   vpc_id      = data.aws_vpc.privatelink.id
 
@@ -42,7 +42,7 @@ resource "aws_security_group" "privatelink" {
   
   tags = {
     Name        = "ccloud-privatelink-${local.network_id}"
-    VPC         = var.vpc_id_to_privatelink
+    VPC         = var.vpc_id
     Environment = "non-prod"
   }
 }
@@ -59,7 +59,7 @@ resource "aws_vpc_endpoint" "privatelink" {
   
   tags = {
     Name        = "ccloud-privatelink-${local.network_id}"
-    VPC         = var.vpc_id_to_privatelink
+    VPC         = var.vpc_id
     Domain      = var.dns_domain
     Environment = "non-prod"
   }
@@ -71,12 +71,12 @@ resource "aws_route53_zone" "privatelink" {
   name = var.dns_domain
   
   vpc {
-    vpc_id = var.vpc_id_to_privatelink
+    vpc_id = var.vpc_id
   }
   
   tags = {
-    Name        = "phz-${local.network_id}-${var.vpc_id_to_privatelink}"
-    VPC         = var.vpc_id_to_privatelink
+    Name        = "phz-${local.network_id}-${var.vpc_id}"
+    VPC         = var.vpc_id
     Domain      = var.dns_domain
     Environment = "non-prod"
   }
@@ -118,7 +118,7 @@ resource "aws_route53_record" "privatelink_zonal" {
 # TFC Agent Association (conditional to prevent conflicts)
 # Only ONE module per environment should set associate_with_tfc_agent_vpc = true
 resource "aws_route53_zone_association" "privatelink_to_tfc_agent" {
-  count = var.associate_with_tfc_agent_vpc && var.tfc_agent_vpc_id != null && var.tfc_agent_vpc_id != var.vpc_id_to_privatelink ? 1 : 0
+  count = var.associate_with_tfc_agent_vpc && var.tfc_agent_vpc_id != null && var.tfc_agent_vpc_id != var.vpc_id ? 1 : 0
   
   zone_id = aws_route53_zone.privatelink.zone_id
   vpc_id  = var.tfc_agent_vpc_id
