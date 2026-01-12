@@ -105,6 +105,27 @@ module "tfc_agent_privatelink" {
   ]
 }
 
+# Tell Confluent to accept the TFC agent VPC endpoint
+resource "confluent_private_link_attachment_connection" "tfc_agent_plattc" {
+  display_name = "tfc-agent-aws-plattc"
+  
+  environment {
+    id = confluent_environment.non_prod.id
+  }
+  
+  aws {
+    vpc_endpoint_id = module.tfc_agent_privatelink.vpc_endpoint_id
+  }
+
+  private_link_attachment {
+    id = confluent_private_link_attachment.non_prod.id
+  }
+  
+  depends_on = [
+    module.tfc_agent_privatelink
+  ]
+}
+
 # ============================================================================
 # OUTPUTS
 # ============================================================================
