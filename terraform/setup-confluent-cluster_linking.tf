@@ -102,31 +102,25 @@ resource "confluent_cluster_link" "sandbox_and_shared" {
   ]
 }
 
-resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
-  source_kafka_topic {
-    topic_name = confluent_kafka_topic.source_stock_trades.topic_name 
-  }
-  cluster_link {
-    link_name = confluent_cluster_link.sandbox_and_shared.link_name
-  }
+# resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
+#   source_kafka_topic {
+#     topic_name = confluent_kafka_topic.source_stock_trades.topic_name 
+#   }
+#   cluster_link {
+#     link_name = confluent_cluster_link.sandbox_and_shared.link_name
+#   }
   
-  kafka_cluster {
-    id            = confluent_kafka_cluster.shared_cluster.id
-    rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
+#   kafka_cluster {
+#     id            = confluent_kafka_cluster.shared_cluster.id
+#     rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
 
-    credentials {
-      key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
-      secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
-    }
-  }
+#     credentials {
+#       key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
+#       secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
+#     }
+#   }
 
-  depends_on = [ 
-    confluent_cluster_link.sandbox_to_shared,
-    module.cluster_linking_sandbox_cluster_app_manager_api_key.active_api_key,
-    module.cluster_linking_shared_cluster_app_manager_api_key.active_api_key,
-    confluent_kafka_topic.source_stock_trades,
-    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
-    confluent_private_link_attachment_connection.shared_cluster_plattc,
-    confluent_private_link_attachment_connection.tfc_agent_plattc
-  ]
-}
+#   depends_on = [ 
+#     confluent_cluster_link.sandbox_and_shared
+#   ]
+# }

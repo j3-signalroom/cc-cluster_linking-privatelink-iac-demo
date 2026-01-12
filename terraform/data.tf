@@ -23,4 +23,6 @@ locals {
     [for s in data.aws_subnet.sandbox_subnets : s.availability_zone_id],
     [for s in data.aws_subnet.shared_subnets : s.availability_zone_id]
   ))
+
+  acl_operations = ["READ", "WRITE", "DESCRIBE"]
 }

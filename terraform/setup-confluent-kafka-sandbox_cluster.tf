@@ -76,12 +76,12 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
   ]
 }
 
-# Create the `stock_trades` Kafka topic
+# Create the `dev-stock_trades` Kafka topic
 resource "confluent_kafka_topic" "source_stock_trades" {
   kafka_cluster {
     id = confluent_kafka_cluster.sandbox_cluster.id
   }
-  topic_name    = "stock_trades"
+  topic_name    = "dev-stock_trades"
   rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
@@ -132,18 +132,24 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
   ]
 }
 
-resource "confluent_kafka_acl" "sandbox_cluster_app_producer_write_on_topic" {
+resource "confluent_kafka_acl" "sandbox_cluster_app_producer_prefix_acls" {
+  for_each = toset(local.acl_operations)
+
   kafka_cluster {
     id = confluent_kafka_cluster.sandbox_cluster.id
   }
+
   resource_type = "TOPIC"
-  resource_name = confluent_kafka_topic.source_stock_trades.topic_name
+  resource_name = "dev-stock_trades"
   pattern_type  = "LITERAL"
+
   principal     = "User:${confluent_service_account.sandbox_cluster_app_producer.id}"
   host          = "*"
-  operation     = "WRITE"
+  operation     = each.value
   permission    = "ALLOW"
+
   rest_endpoint = confluent_kafka_cluster.sandbox_cluster.rest_endpoint
+
   credentials {
     key    = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.id
     secret = module.kafka_sandbox_cluster_app_manager_api_key.active_api_key.secret
@@ -281,7 +287,8 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_target_to
   }
 
   depends_on = [
-    time_sleep.wait_for_sandbox_dns
+    time_sleep.wait_for_sandbox_dns,
+    confluent_kafka_acl.sandbox_cluster_app_producer_prefix_acls
   ]
 }
 
