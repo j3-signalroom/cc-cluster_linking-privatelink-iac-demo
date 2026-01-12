@@ -121,7 +121,12 @@ resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
   }
 
   depends_on = [ 
-    confluent_cluster_link.sandbox_and_shared,
-    confluent_kafka_topic.source_stock_trades
+    confluent_cluster_link.sandbox_to_shared,
+    module.cluster_linking_sandbox_cluster_app_manager_api_key.active_api_key,
+    module.cluster_linking_shared_cluster_app_manager_api_key.active_api_key,
+    confluent_kafka_topic.source_stock_trades,
+    confluent_private_link_attachment_connection.sandbox_cluster_plattc,
+    confluent_private_link_attachment_connection.shared_cluster_plattc,
+    confluent_private_link_attachment_connection.tfc_agent_plattc
   ]
 }
