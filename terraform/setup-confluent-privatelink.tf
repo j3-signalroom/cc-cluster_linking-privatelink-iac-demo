@@ -23,12 +23,8 @@ module "sandbox_cluster_privatelink" {
   vpc_id     = var.sandbox_cluster_vpc_id
   subnet_ids = split(",", var.sandbox_cluster_subnet_ids)
 
-  # TFC Agent integration
-  tfc_agent_vpc_id = var.tfc_agent_vpc_id
-  
-  # CRITICAL: Enable TFC Agent association for this module
-  # Only ONE module per environment should set this to true
-  associate_with_tfc_agent_vpc = true
+  tfc_agent_vpc_id             = null
+  associate_with_tfc_agent_vpc = false
 }
 
 resource "confluent_private_link_attachment_connection" "sandbox_cluster_plattc" {
@@ -62,11 +58,7 @@ module "shared_cluster_privatelink" {
   vpc_id     = var.shared_cluster_vpc_id
   subnet_ids = split(",", var.shared_cluster_subnet_ids)
   
-  # TFC Agent integration
-  tfc_agent_vpc_id = var.tfc_agent_vpc_id
-  
-  # CRITICAL: Disable TFC Agent association (prevents conflict)
-  # TFC Agent is already associated via sandbox module
+  tfc_agent_vpc_id             = null
   associate_with_tfc_agent_vpc = false
   
   # Ensure sandbox creates its association first
@@ -89,6 +81,28 @@ resource "confluent_private_link_attachment_connection" "shared_cluster_plattc" 
   private_link_attachment {
     id = confluent_private_link_attachment.non_prod.id
   }
+}
+
+# ============================================================================
+# TFC AGENT - PrivateLink Endpoint
+# ============================================================================
+module "tfc_agent_privatelink" {
+  source = "./aws-privatelink-endpoint"
+  
+  privatelink_service_name = confluent_private_link_attachment.non_prod.aws[0].vpc_endpoint_service_name
+  dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
+  
+  # TFC Agent VPC configuration
+  vpc_id     = var.tfc_agent_vpc_id
+  subnet_ids = split(",", var.tfc_agent_subnet_ids)
+  
+  tfc_agent_vpc_id             = null
+  associate_with_tfc_agent_vpc = false
+  
+  depends_on = [
+    module.sandbox_cluster_privatelink,
+    module.shared_cluster_privatelink
+  ]
 }
 
 # ============================================================================

@@ -9,10 +9,6 @@ resource "confluent_kafka_cluster" "sandbox_cluster" {
   environment {
     id = confluent_environment.non_prod.id
   }
-
-  network {
-    id = confluent_network.non_prod.id  # This makes it use PrivateLink
-  }
 }
 
 resource "time_sleep" "wait_for_sandbox_dns" {

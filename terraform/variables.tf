@@ -82,3 +82,8 @@ variable "tfc_agent_vpc_id" {
   description = "VPC ID where the Terraform Cloud Agent is running."
   type        = string
 }
+
+variable "tfc_agent_subnet_ids" {
+  description = "Subnet IDs for TFC Agent VPC PrivateLink endpoint (comma-separated)"
+  type        = string
+}

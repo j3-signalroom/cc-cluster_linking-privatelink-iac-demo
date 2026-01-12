@@ -9,6 +9,7 @@
 #                                --confluent-api-key=<CONFLUENT_API_KEY>
 #                                --confluent-api-secret=<CONFLUENT_API_SECRET>
 #                                --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>
+#                                --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>
 #                                --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID>
 #                                --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS>
 #                                --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID>
@@ -59,7 +60,7 @@ case $1 in
     echo
     echo "(Error Message 001)  You did not specify one of the commands: create | destroy."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
     ;;
@@ -70,6 +71,7 @@ AWS_PROFILE=""
 confluent_api_key=""
 confluent_api_secret=""
 tfc_agent_vpc_id=""
+tfc_agent_subnet_ids=""
 sandbox_cluster_vpc_id=""
 sandbox_cluster_subnet_ids=""
 shared_cluster_vpc_id=""
@@ -107,6 +109,9 @@ do
         *"--tfc-agent-vpc-id="*)
             arg_length=19
             tfc_agent_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--tfc-agent-subnet-ids="*)
+            arg_length=23
+            tfc_agent_subnet_ids=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--day-count="*)
             arg_length=12
             day_count=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -119,7 +124,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -130,7 +135,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -141,7 +146,7 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -152,7 +157,7 @@ then
     echo
     echo "(Error Message 005)  You did not include the proper use of the --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -163,7 +168,7 @@ then
     echo
     echo "(Error Message 006)  You did not include the proper use of the --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -174,7 +179,7 @@ then
     echo
     echo "(Error Message 007)  You did not include the proper use of the --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -185,7 +190,7 @@ then
     echo
     echo "(Error Message 008)  You did not include the proper use of the --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -196,7 +201,18 @@ then
     echo
     echo "(Error Message 009)  You did not include the proper use of the --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eight arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
+# Check required --tfc-agent-subnet-ids argument was supplied
+if [ -z "$tfc_agent_subnet_ids" ]
+then
+    echo
+    echo "(Error Message 010)  You did not include the proper use of the --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> argument in the call."
+    echo
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -230,6 +246,7 @@ deploy_infrastructure() {
     export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
     export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
     export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
+    export TF_VAR_tfc_agent_subnet_ids=${tfc_agent_subnet_ids}
 
     # Initialize Terraform if needed
     print_info "Initializing Terraform..."
@@ -283,6 +300,7 @@ undeploy_infrastructure() {
     export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
     export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
     export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
+    export TF_VAR_tfc_agent_subnet_ids=${tfc_agent_subnet_ids}
 
     # Destroy
     print_info "Running Terraform destroy..."
