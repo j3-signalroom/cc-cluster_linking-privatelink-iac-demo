@@ -10,7 +10,7 @@ provider "confluent" {
   cloud_api_secret = var.confluent_api_secret
 }
 
-# provider "tfe" {
-#   hostname = "app.terraform.io"
-#   token    = var.tfc_api_token
-# }
+provider "tfe" {
+  hostname = "app.terraform.io"
+  token    = var.tfe_token
+}

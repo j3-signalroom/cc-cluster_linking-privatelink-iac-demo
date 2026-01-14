@@ -1,3 +1,6 @@
+# ===================================================
+# CONFLUENT CLOUD CONFIGURATION
+# ===================================================
 variable "confluent_api_key" {
   description = "Confluent API Key (also referred as Cloud API ID)."
   type        = string
@@ -9,6 +12,9 @@ variable "confluent_api_secret" {
   sensitive   = true
 }
 
+# ===================================================
+# AWS PROVIDER CONFIGURATION
+# ===================================================
 variable "aws_region" {
     description = "The AWS Region."
     type        = string
@@ -31,6 +37,10 @@ variable "aws_session_token" {
     type        = string
     default     = ""
 }
+
+# ===================================================
+# CONFLUENT API KEY ROTATION CONFIGURATION
+# ===================================================
 variable "day_count" {
     description = "How many day(s) should the API Key be rotated for."
     type        = number
@@ -58,6 +68,9 @@ variable "confluent_secret_root_path" {
     type        = string
 }
 
+# ===================================================
+# VPC CONFIGURATIONS
+# ===================================================
 variable "sandbox_cluster_vpc_id" {
   description = "The VPC ID used for the PrivateLink endpoint for the Sandbox Kafka Cluster."
   type        = string
@@ -78,6 +91,9 @@ variable "shared_cluster_subnet_ids" {
   type        = string
 }
 
+# ===================================================
+# TERRAFORM CLOUD AGENT CONFIGURATION
+# ===================================================
 variable "tfc_agent_vpc_id" {
   description = "VPC ID where the Terraform Cloud Agent is running."
   type        = string
@@ -88,8 +104,9 @@ variable "tfc_agent_subnet_ids" {
   type        = string
 }
 
-variable "tfc_api_token" {
+variable "tfe_token" {
   description = "Terraform Cloud API Token"
   type        = string
-  sensitive   = true
+#  sensitive   = true
+  default     = ""
 }
