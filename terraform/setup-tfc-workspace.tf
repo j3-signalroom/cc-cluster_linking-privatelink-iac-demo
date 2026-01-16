@@ -1,6 +1,6 @@
 locals {
     organization_name = "signalroom"
-    agent_pool_name   = "signalroom-tfc-agent-pool"
+    agent_pool_name   = "signalroom-iac-tfc-agents-pool"
     workspace_name    = "cc-cluster-linking-privatelink-iac-demo"
 }
 
