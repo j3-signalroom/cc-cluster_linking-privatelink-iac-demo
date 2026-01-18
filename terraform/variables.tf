@@ -107,7 +107,24 @@ variable "tfc_agent_subnet_ids" {
 variable "tfe_token" {
   description = "Terraform Cloud API Token"
   type        = string
-#  sensitive   = true
+  sensitive   = true
   default     = ""
 }
 
+# ===================================================
+# CLIENT VPN CONFIGURATION
+# ===================================================
+variable "client_vpn_vpc_id" {
+  description = "VPC ID of your Client VPN"
+  type        = string
+}
+
+variable "client_vpn_cidr" {
+  description = "Client VPN CIDR block"
+  type        = string
+}
+
+variable "client_vpn_subnet_ids" {
+  description = "Client VPN subnet IDs (comma-separated)"
+  type        = string
+}

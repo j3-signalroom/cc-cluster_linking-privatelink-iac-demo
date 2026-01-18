@@ -35,3 +35,18 @@ output "security_group_id" {
   description = "Security group ID attached to the VPC endpoint"
   value       = aws_security_group.privatelink.id
 }
+
+output "inbound_resolver_ips" {
+  description = "IP addresses of the inbound resolver endpoint"
+  value       = aws_route53_resolver_endpoint.inbound.ip_address[*].ip
+}
+
+output "outbound_resolver_id" {
+  description = "ID of the outbound resolver endpoint"
+  value       = aws_route53_resolver_endpoint.outbound.id
+}
+
+output "resolver_rule_id" {
+  description = "ID of the resolver rule"
+  value       = aws_route53_resolver_rule.confluent_cloud.id
+}

@@ -125,3 +125,178 @@ resource "time_sleep" "wait_for_zone_associations" {
   
   create_duration = "2m"
 }
+
+# Security Group for Inbound Resolver (in Confluent VPC)
+resource "aws_security_group" "inbound_resolver" {
+  name_prefix = "confluent-inbound-resolver-"
+  description = "Security group for Route 53 Inbound Resolver"
+  vpc_id      = data.aws_vpc.privatelink.id
+
+  ingress {
+    description = "DNS TCP from Client VPN VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.client_vpn.cidr_block]
+  }
+
+  ingress {
+    description = "DNS UDP from Client VPN VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [data.aws_vpc.client_vpn.cidr_block]
+  }
+
+  ingress {
+    description = "DNS TCP from Client VPN clients"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [var.client_vpn_cidr]
+  }
+
+  ingress {
+    description = "DNS UDP from Client VPN clients"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [var.client_vpn_cidr]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "confluent-inbound-resolver-sg"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Security Group for Outbound Resolver (in Client VPN VPC)
+resource "aws_security_group" "outbound_resolver" {
+  name_prefix = "client-vpn-outbound-resolver-"
+  description = "Security group for Route 53 Outbound Resolver"
+  vpc_id      = data.aws_vpc.client_vpn.id
+
+  ingress {
+    description = "DNS TCP from VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.client_vpn.cidr_block]
+  }
+
+  ingress {
+    description = "DNS UDP from VPC"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [data.aws_vpc.client_vpn.cidr_block]
+  }
+
+  ingress {
+    description = "DNS TCP from Client VPN clients"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = [var.client_vpn_cidr]
+  }
+
+  ingress {
+    description = "DNS UDP from Client VPN clients"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = [var.client_vpn_cidr]
+  }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "client-vpn-outbound-resolver-sg"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Route 53 Resolver - Inbound Endpoint (in Confluent VPC)
+resource "aws_route53_resolver_endpoint" "inbound" {
+  name      = "confluent-inbound-resolver"
+  direction = "INBOUND"
+
+  security_group_ids = [aws_security_group.inbound_resolver.id]
+
+  # Use first two subnets in different AZs
+  ip_address {
+    subnet_id = var.client_vpn_subnet_ids[0]
+  }
+
+  ip_address {
+    subnet_id = var.client_vpn_subnet_ids[1]
+  }
+
+  tags = {
+    Name        = "confluent-inbound-resolver"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Route 53 Resolver - Outbound Endpoint (in Client VPN VPC)
+resource "aws_route53_resolver_endpoint" "outbound" {
+  name      = "client-vpn-outbound-resolver"
+  direction = "OUTBOUND"
+
+  security_group_ids = [aws_security_group.outbound_resolver.id]
+
+  # Use first two subnets in different AZs
+  ip_address {
+    subnet_id = var.client_vpn_subnet_ids[0]
+  }
+
+  ip_address {
+    subnet_id = var.client_vpn_subnet_ids[1]
+  }
+
+  tags = {
+    Name        = "client-vpn-outbound-resolver"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Route 53 Resolver Rule - Forward *.<AWS_REGION>.aws.private.confluent.cloud to Inbound Endpoint
+resource "aws_route53_resolver_rule" "confluent_cloud" {
+  name                 = "confluent-cloud-resolver-rule"
+  domain_name          = var.dns_domain
+  rule_type            = "FORWARD"
+  resolver_endpoint_id = aws_route53_resolver_endpoint.outbound.id
+
+  # Target the inbound resolver IPs
+  dynamic "target_ip" {
+    for_each = aws_route53_resolver_endpoint.inbound.ip_address
+    content {
+      ip = target_ip.value.ip
+    }
+  }
+
+  tags = {
+    Name        = "confluent-cloud-resolver-rule"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Associate the resolver rule with Client VPN VPC
+resource "aws_route53_resolver_rule_association" "client_vpn" {
+  resolver_rule_id = aws_route53_resolver_rule.confluent_cloud.id
+  vpc_id           = data.aws_vpc.client_vpn.id
+}
