@@ -22,9 +22,6 @@ module "sandbox_cluster_privatelink" {
   # AWS VPC configuration
   vpc_id     = var.sandbox_cluster_vpc_id
   subnet_ids = split(",", var.sandbox_cluster_subnet_ids)
-
-  tfc_agent_vpc_id             = null
-  associate_with_tfc_agent_vpc = false
 }
 
 resource "confluent_private_link_attachment_connection" "sandbox_cluster_plattc" {
@@ -57,9 +54,6 @@ module "shared_cluster_privatelink" {
   # AWS VPC configuration
   vpc_id     = var.shared_cluster_vpc_id
   subnet_ids = split(",", var.shared_cluster_subnet_ids)
-  
-  tfc_agent_vpc_id             = null
-  associate_with_tfc_agent_vpc = false
   
   # Ensure sandbox creates its association first
   depends_on = [
@@ -95,9 +89,6 @@ module "tfc_agent_privatelink" {
   # TFC Agent VPC configuration
   vpc_id     = var.tfc_agent_vpc_id
   subnet_ids = split(",", var.tfc_agent_subnet_ids)
-  
-  tfc_agent_vpc_id             = null
-  associate_with_tfc_agent_vpc = false
   
   depends_on = [
     module.sandbox_cluster_privatelink,
