@@ -115,19 +115,6 @@ resource "aws_route53_record" "privatelink_zonal" {
   ]
 }
 
-# TFC Agent Association (conditional to prevent conflicts)
-# Only ONE module per environment should set associate_with_tfc_agent_vpc = true
-resource "aws_route53_zone_association" "privatelink_to_tfc_agent" {
-  count = var.associate_with_tfc_agent_vpc && var.tfc_agent_vpc_id != null && var.tfc_agent_vpc_id != var.vpc_id ? 1 : 0
-  
-  zone_id = aws_route53_zone.privatelink.zone_id
-  vpc_id  = var.tfc_agent_vpc_id
-  
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 # Wait for DNS propagation
 resource "time_sleep" "wait_for_zone_associations" {
   depends_on = [
