@@ -65,7 +65,6 @@ module "kafka_shared_cluster_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
-  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_role_binding.shared_cluster_app_manager_kafka_cluster_admin,
@@ -103,7 +102,6 @@ module "kafka_shared_cluster_app_consumer_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
-  disable_wait_for_ready       = true
 
   depends_on = [
     confluent_private_link_attachment_connection.shared_cluster_plattc,

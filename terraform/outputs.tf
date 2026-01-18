@@ -7,7 +7,6 @@ output "sandbox_cluster_deployment" {
     availability_zones    = module.sandbox_cluster_privatelink.availability_zones
     route53_zone_id       = module.sandbox_cluster_privatelink.route53_zone_id
     dns_domain            = module.sandbox_cluster_privatelink.route53_zone_name
-    tfc_agent_association = module.sandbox_cluster_privatelink.tfc_agent_association_created
     security_group_id     = module.sandbox_cluster_privatelink.security_group_id
   }
 }
@@ -21,7 +20,6 @@ output "shared_cluster_deployment" {
     availability_zones    = module.shared_cluster_privatelink.availability_zones
     route53_zone_id       = module.shared_cluster_privatelink.route53_zone_id
     dns_domain            = module.shared_cluster_privatelink.route53_zone_name
-    tfc_agent_association = module.shared_cluster_privatelink.tfc_agent_association_created
     security_group_id     = module.shared_cluster_privatelink.security_group_id
   }
 }

@@ -33,7 +33,6 @@ module "sandbox_cluster_linking_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
-  disable_wait_for_ready       = true
 }
 
 resource "confluent_service_account" "shared_cluster_linking_app_manager" {
@@ -71,7 +70,6 @@ module "shared_cluster_linking_app_manager_api_key" {
   key_display_name             = "Confluent Kafka Cluster Service Account API Key - {date} - Managed by Terraform Cloud"
   number_of_api_keys_to_retain = var.number_of_api_keys_to_retain
   day_count                    = var.day_count
-  disable_wait_for_ready       = true
 }
 
 resource "confluent_cluster_link" "sandbox_and_shared" {
