@@ -112,19 +112,9 @@ variable "tfe_token" {
 }
 
 # ===================================================
-# CLIENT VPN CONFIGURATION
+# ENTERPRISE CONFIGURATION
 # ===================================================
-variable "client_vpn_vpc_id" {
-  description = "VPC ID of your Client VPN"
-  type        = string
-}
-
-variable "client_vpn_cidr" {
-  description = "Client VPN CIDR block"
-  type        = string
-}
-
-variable "client_vpn_subnet_ids" {
-  description = "Client VPN subnet IDs (comma-separated)"
+variable "enterprise_dns_vpc_id" {
+  description = "Enterprise (centralized) DNS VPC ID - Private Hosted Zones will be associated with this VPC"
   type        = string
 }

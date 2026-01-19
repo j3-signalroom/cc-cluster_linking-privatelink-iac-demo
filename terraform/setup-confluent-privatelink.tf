@@ -23,12 +23,8 @@ module "sandbox_cluster_privatelink" {
   vpc_id     = var.sandbox_cluster_vpc_id
   subnet_ids = split(",", var.sandbox_cluster_subnet_ids)
 
-  # Client VPN configuration
-  client_vpn_vpc_id     = var.client_vpn_vpc_id
-  client_vpn_subnet_ids = split(",", var.client_vpn_subnet_ids)
-  client_vpn_cidr       = var.client_vpn_cidr
-
-  create_resolver_infrastructure = true
+  # Enterprise configuration
+  enterprise_dns_vpc_id = var.enterprise_dns_vpc_id
 }
 
 resource "confluent_private_link_attachment_connection" "sandbox_cluster_plattc" {
@@ -62,11 +58,8 @@ module "shared_cluster_privatelink" {
   vpc_id     = var.shared_cluster_vpc_id
   subnet_ids = split(",", var.shared_cluster_subnet_ids)
   
-
-  # Client VPN configuration
-  client_vpn_vpc_id     = var.client_vpn_vpc_id
-  client_vpn_subnet_ids = split(",", var.client_vpn_subnet_ids)
-  client_vpn_cidr       = var.client_vpn_cidr 
+  # Enterprise configuration
+  enterprise_dns_vpc_id = var.enterprise_dns_vpc_id
 
   # Ensure sandbox creates its association first
   depends_on = [
@@ -103,11 +96,8 @@ module "tfc_agent_privatelink" {
   vpc_id     = var.tfc_agent_vpc_id
   subnet_ids = split(",", var.tfc_agent_subnet_ids)
   
-
-  # Client VPN configuration
-  client_vpn_vpc_id     = var.client_vpn_vpc_id
-  client_vpn_subnet_ids = split(",", var.client_vpn_subnet_ids)
-  client_vpn_cidr       = var.client_vpn_cidr 
+  # Enterprise configuration
+  enterprise_dns_vpc_id = var.enterprise_dns_vpc_id
   
   depends_on = [
     module.sandbox_cluster_privatelink,
