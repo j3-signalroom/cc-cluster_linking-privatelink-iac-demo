@@ -23,17 +23,3 @@ output "shared_cluster_deployment" {
     security_group_id     = module.shared_cluster_privatelink.security_group_id
   }
 }
-
-output "tfc_agent_integration" {
-  description = "TFC Agent integration status"
-  value = {
-    tfc_agent_vpc_id    = var.tfc_agent_vpc_id
-    associated_via      = "sandbox_cluster_privatelink"
-    dns_coverage        = "Both sandbox and shared clusters (via wildcard DNS)"
-    clusters_accessible = [
-      "${confluent_kafka_cluster.sandbox_cluster.id} (sandbox)",
-      "${confluent_kafka_cluster.shared_cluster.id} (shared)",
-      "All clusters in environment ${confluent_environment.non_prod.id}"
-    ]
-  }
-}

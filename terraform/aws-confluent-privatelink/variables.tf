@@ -23,7 +23,7 @@ variable "subnet_ids" {
   type        = list(string)
 }
 
-variable "enterprise_dns_vpc_id" {
+variable "dns_vpc_id" {
   description = "Enterprise (centralized) DNS VPC ID - Private Hosted Zones will be associated with this VPC"
   type        = string
 }
@@ -35,5 +35,10 @@ variable "confluent_environment_id" {
 
 variable "confluent_platt_id" {
   description = "Confluent PrivateLink Attachment ID"
+  type        = string
+}
+
+variable "tfc_agent_vpc_id" {
+  description = "Terraform Cloud Agent VPC ID (for tagging PHZ association purposes)"
   type        = string
 }

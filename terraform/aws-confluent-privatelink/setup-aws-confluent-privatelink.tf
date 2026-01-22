@@ -1,7 +1,7 @@
 # Security Group for VPC Endpoint
 resource "aws_security_group" "privatelink" {
   name        = "ccloud-privatelink_${local.network_id}_${var.vpc_id}"
-  description = "Confluent Cloud Private Link security group for ${var.dns_domain}"
+  description = "Confluent Cloud Private Link Security Group for ${var.dns_domain}"
   vpc_id      = data.aws_vpc.privatelink.id
 
   ingress {
@@ -9,7 +9,7 @@ resource "aws_security_group" "privatelink" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.privatelink.cidr_block]
-    description = "HTTP from VPC"
+    description = "HTTP from ${var.vpc_id}"
   }
 
   ingress {
@@ -17,7 +17,7 @@ resource "aws_security_group" "privatelink" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.privatelink.cidr_block]
-    description = "HTTPS from VPC"
+    description = "HTTPS from ${var.vpc_id}"
   }
 
   ingress {
@@ -25,7 +25,7 @@ resource "aws_security_group" "privatelink" {
     to_port     = 9092
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.privatelink.cidr_block]
-    description = "Kafka from VPC"
+    description = "Kafka from ${var.vpc_id}"
   }
 
   egress {
@@ -33,7 +33,7 @@ resource "aws_security_group" "privatelink" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
+    description = "Allow all outbound from ${var.vpc_id}"
   }
 
   lifecycle {
@@ -90,7 +90,7 @@ resource "aws_route53_zone" "privatelink" {
 # Associate the Private Hosted Zone with the centralized DNS VPC
 resource "aws_route53_zone_association" "dns_vpc" {
   zone_id = aws_route53_zone.privatelink.zone_id
-  vpc_id  = var.enterprise_dns_vpc_id
+  vpc_id  = var.dns_vpc_id
 
   depends_on = [ 
     aws_route53_zone.privatelink
@@ -174,4 +174,15 @@ resource "confluent_private_link_attachment_connection" "privatelink" {
   depends_on = [
     time_sleep.wait_for_zone_associations
   ]
+}
+
+# ============================================================================
+# Associate Confluent Private Hosted Zone with TFC Agent VPC
+# ============================================================================
+# ONLY when the TFC Agent VPC ID is provided
+resource "aws_route53_zone_association" "tfc_agent" {
+  count = (var.tfc_agent_vpc_id != "") ? 1 : 0
+  
+  zone_id = aws_route53_zone.privatelink.zone_id
+  vpc_id  = var.tfc_agent_vpc_id
 }

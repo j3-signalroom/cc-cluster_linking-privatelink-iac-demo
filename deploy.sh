@@ -6,12 +6,11 @@
 #
 # *** Script Syntax ***
 # ./deploy.sh=<create | destroy> --profile=<SSO_PROFILE_NAME>
-#                                --confluent-api-key=<CONFLUENT_API_KEY>
-#                                --confluent-api-secret=<CONFLUENT_API_SECRET>
-#                                --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>
 #                                --tfe-token=<TFE_TOKEN>
 #                                --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>
-#                                --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS>
+#                                --confluent-api-key=<CONFLUENT_API_KEY>
+#                                --confluent-api-secret=<CONFLUENT_API_SECRET>
+#                                --dns-vpc-id=<dns_vpc_id>
 #                                --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID>
 #                                --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS>
 #                                --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID>
@@ -53,6 +52,8 @@ TERRAFORM_DIR="$SCRIPT_DIR/terraform"
 
 print_info "Terraform Directory: $TERRAFORM_DIR"
 
+arugument_list="--profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --dns-vpc-id=<dns_vpc_id> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID>"
+
 # Check required command (create or destroy) was supplied
 case $1 in
   create)
@@ -63,7 +64,7 @@ case $1 in
     echo
     echo "(Error Message 001)  You did not specify one of the commands: create | destroy."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0`=<create | destroy> --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all eleven arguments ---> `basename $0`=<create | destroy> $arugument_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
     ;;
@@ -74,13 +75,12 @@ AWS_PROFILE=""
 confluent_api_key=""
 confluent_api_secret=""
 tfe_token=""
-tfc_agent_vpc_id=""
-tfc_agent_subnet_ids=""
 sandbox_cluster_vpc_id=""
 sandbox_cluster_subnet_ids=""
 shared_cluster_vpc_id=""
 shared_cluster_subnet_ids=""
-enterprise_dns_vpc_id=""
+dns_vpc_id=""
+tfc_agent_vpc_id=""
 
 # Default optional variable(s)
 day_count=30
@@ -120,9 +120,12 @@ do
         *"--tfe-token="*)
             arg_length=12
             tfe_token=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
-        *"--enterprise-dns-vpc-id="*)
-            arg_length=24
-            enterprise_dns_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--dns-vpc-id="*)
+            arg_length=13
+            dns_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--tfc-agent-vpc-id="*)
+            arg_length=19
+            tfc_agent_vpc_id=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
         *"--day-count="*)
             arg_length=12
             day_count=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
@@ -135,7 +138,7 @@ then
     echo
     echo "(Error Message 002)  You did not include the proper use of the -- profile=<SSO_PROFILE_NAME> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -146,7 +149,7 @@ then
     echo
     echo "(Error Message 003)  You did not include the proper use of the --confluent-api-key=<CONFLUENT_API_KEY> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -157,7 +160,7 @@ then
     echo
     echo "(Error Message 004)  You did not include the proper use of the --confluent-api-secret=<CONFLUENT_API_SECRET> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -168,7 +171,7 @@ then
     echo
     echo "(Error Message 005)  You did not include the proper use of the --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -179,7 +182,7 @@ then
     echo
     echo "(Error Message 006)  You did not include the proper use of the --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -190,7 +193,7 @@ then
     echo
     echo "(Error Message 007)  You did not include the proper use of the --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -201,29 +204,7 @@ then
     echo
     echo "(Error Message 008)  You did not include the proper use of the --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
-    echo
-    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
-fi
-
-# Check required --tfc-agent-vpc-id argument was supplied
-if [ -z "$tfc_agent_vpc_id" ]
-then
-    echo
-    echo "(Error Message 009)  You did not include the proper use of the --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> argument in the call."
-    echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
-    echo
-    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
-fi
-
-# Check required --tfc-agent-subnet-ids argument was supplied
-if [ -z "$tfc_agent_subnet_ids" ]
-then
-    echo
-    echo "(Error Message 010)  You did not include the proper use of the --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> argument in the call."
-    echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -232,20 +213,31 @@ fi
 if [ -z "$tfe_token" ]
 then
     echo
-    echo "(Error Message 011)  You did not include the proper use of the --tfe-token=<TFE_TOKEN> argument in the call."
+    echo "(Error Message 009)  You did not include the proper use of the --tfe-token=<TFE_TOKEN> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
 
-# Check required --enterprise-dns-vpc-id argument was supplied
-if [ -z "$enterprise_dns_vpc_id" ]
+# Check required --dns-vpc-id argument was supplied
+if [ -z "$dns_vpc_id" ]
 then
     echo
-    echo "(Error Message 012)  You did not include the proper use of the --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID> argument in the call."
+    echo "(Error Message 010)  You did not include the proper use of the --dns-vpc-id=<dns_vpc_id> argument in the call."
     echo
-    echo "Usage:  Require all eleven arguments ---> `basename $0 $1` --profile=<SSO_PROFILE_NAME> --confluent-api-key=<CONFLUENT_API_KEY> --confluent-api-secret=<CONFLUENT_API_SECRET> --sandbox-cluster-vpc-id=<SANDBOX_CLUSTER_VPC_ID> --sandbox-cluster-subnet-ids=<SANDBOX_CLUSTER_SUBNET_IDS> --shared-cluster-vpc-id=<SHARED_CLUSTER_VPC_ID> --shared-cluster-subnet-ids=<SHARED_CLUSTER_SUBNET_IDS> --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> --tfc-agent-subnet-ids=<TFC_AGENT_SUBNET_IDS> --tfe-token=<TFE_TOKEN> --enterprise-dns-vpc-id=<ENTERPRISE_DNS_VPC_ID>"
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
+    echo
+    exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
+fi
+
+# Check required --tfc-agent-vpc-id argument was supplied
+if [ -z "$tfc_agent_vpc_id" ]
+then
+    echo
+    echo "(Error Message 011)  You did not include the proper use of the --tfc-agent-vpc-id=<TFC_AGENT_VPC_ID> argument in the call."
+    echo
+    echo "Usage:  Require all nine arguments ---> `basename $0 $1` $augment_list"
     echo
     exit 85 # Common GNU/Linux Exit Code for 'Interrupted system call should be restarted'
 fi
@@ -279,10 +271,9 @@ deploy_infrastructure() {
     export TF_VAR_sandbox_cluster_subnet_ids=${sandbox_cluster_subnet_ids}
     export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
     export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
-    export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
-    export TF_VAR_tfc_agent_subnet_ids=${tfc_agent_subnet_ids}
     export TF_VAR_tfe_token="${tfe_token}"
-    export TF_VAR_enterprise_dns_vpc_id="${enterprise_dns_vpc_id}"
+    export TF_VAR_dns_vpc_id="${dns_vpc_id}"
+    export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
 
     # Initialize Terraform if needed
     print_info "Initializing Terraform..."
@@ -335,10 +326,9 @@ undeploy_infrastructure() {
     export TF_VAR_sandbox_cluster_subnet_ids=${sandbox_cluster_subnet_ids}
     export TF_VAR_shared_cluster_vpc_id="${shared_cluster_vpc_id}"
     export TF_VAR_shared_cluster_subnet_ids=${shared_cluster_subnet_ids}
-    export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
-    export TF_VAR_tfc_agent_subnet_ids=${tfc_agent_subnet_ids}
     export TF_VAR_tfe_token="${tfe_token}"
-    export TF_VAR_enterprise_dns_vpc_id="${enterprise_dns_vpc_id}"
+    export TF_VAR_dns_vpc_id="${dns_vpc_id}"
+    export TF_VAR_tfc_agent_vpc_id="${tfc_agent_vpc_id}"
 
     # Destroy
     print_info "Running Terraform destroy..."
@@ -354,6 +344,10 @@ undeploy_infrastructure() {
     aws secretsmanager delete-secret --secret-id ${confluent_secret_root_path}/shared_cluster/app_consumer/java_client --force-delete-without-recovery || true
     
     print_info "Infrastructure destroyed successfully!"
+
+    print_info "Creating the Terraform visualization..."
+    terraform graph | dot -Tpng > ../docs/images/terraform-visualization.png
+    print_info "Terraform visualization created at: ../docs/images/terraform-visualization.png"
     cd ..
 }   
 

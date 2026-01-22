@@ -92,18 +92,8 @@ variable "shared_cluster_subnet_ids" {
 }
 
 # ===================================================
-# TERRAFORM CLOUD AGENT CONFIGURATION
+# TERRAFORM CONFIGURATION
 # ===================================================
-variable "tfc_agent_vpc_id" {
-  description = "VPC ID where the Terraform Cloud Agent is running."
-  type        = string
-}
-
-variable "tfc_agent_subnet_ids" {
-  description = "Subnet IDs for TFC Agent VPC PrivateLink endpoint (comma-separated)"
-  type        = string
-}
-
 variable "tfe_token" {
   description = "Terraform Cloud API Token"
   type        = string
@@ -111,10 +101,15 @@ variable "tfe_token" {
   default     = ""
 }
 
+variable "tfc_agent_vpc_id" {
+  description = "Terraform Cloud Agent VPC ID (for tagging PHZ association purposes)"
+  type        = string
+}
+
 # ===================================================
 # ENTERPRISE CONFIGURATION
 # ===================================================
-variable "enterprise_dns_vpc_id" {
+variable "dns_vpc_id" {
   description = "Enterprise (centralized) DNS VPC ID - Private Hosted Zones will be associated with this VPC"
   type        = string
 }
