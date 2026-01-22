@@ -52,7 +52,7 @@ module "shared_cluster_privatelink" {
   subnet_ids = split(",", var.shared_cluster_subnet_ids)
   
   # Enterprise configuration
-  dns_vpc_id = var.dns_vpc_id
+  dns_vpc_id = ""
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
