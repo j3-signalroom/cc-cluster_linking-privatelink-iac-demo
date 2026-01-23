@@ -120,6 +120,11 @@ resource "aws_ec2_transit_gateway_route_table_association" "privatelink" {
   transit_gateway_route_table_id = var.tgw_rt_id
 }
 
+resource "aws_ec2_transit_gateway_route_table_propagation" "privatelink" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.privatelink.id
+  transit_gateway_route_table_id = var.tgw_rt_id
+}
+
 # ============================================================================
 # ROUTE TABLE UPDATES FOR TRANSIT GATEWAY CONNECTIVITY
 # ============================================================================

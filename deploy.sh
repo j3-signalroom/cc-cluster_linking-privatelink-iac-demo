@@ -255,6 +255,24 @@ deploy_infrastructure() {
     
     cd "$TERRAFORM_DIR"
     
+    # UNCOMMENT WHEN YOU WANT TO USE A terraform.tfvars FILE INSTEAD OF ENVIRONMENT VARIABLES
+    # Create terraform.tfvars file with the required variables
+    # printf "aws_region=\"${AWS_REGION}\"\
+    # \naws_access_key_id=\"${AWS_ACCESS_KEY_ID}\"\
+    # \naws_secret_access_key=\"${AWS_SECRET_ACCESS_KEY}\"\
+    # \naws_session_token=\"${AWS_SESSION_TOKEN}\"\
+    # \nconfluent_api_key=\"${confluent_api_key}\"\
+    # \nconfluent_api_secret=\"${confluent_api_secret}\"\
+    # \nconfluent_secret_root_path=\"${confluent_secret_root_path}\"\
+    # \ntfe_token=\"${tfe_token}\"\
+    # \ndns_vpc_id=\"${dns_vpc_id}\"\
+    # \ntfc_agent_vpc_id=\"${tfc_agent_vpc_id}\"\
+    # \ntfc_agent_vpc_cidr=\"${tfc_agent_vpc_cidr}\"\
+    # \nday_count=${day_count}\
+    # \nvpn_client_cidr=\"${vpn_client_cidr}\"
+    # \ntgw_id=\"${tgw_id}\"
+    # \ntgw_rt_id=\"${tgw_rt_id}\"" > terraform.tfvars
+
     # Export AWS credentials, Confluent credentials and optional variables as environment variables
     export TF_VAR_aws_region="${AWS_REGION}"
     export TF_VAR_aws_access_key_id="${AWS_ACCESS_KEY_ID}"
