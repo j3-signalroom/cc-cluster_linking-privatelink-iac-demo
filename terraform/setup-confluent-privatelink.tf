@@ -93,7 +93,7 @@ module "sandbox_vpc_privatelink" {
   confluent_platt_id       = confluent_private_link_attachment.non_prod.id
 
   # Terraform Cloud Agent configuration
-  tfc_agent_vpc_id         = ""
+  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
   tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
 
   # Use shared PHZ instead of creating own
@@ -135,7 +135,7 @@ module "shared_vpc_privatelink" {
   confluent_platt_id       = confluent_private_link_attachment.non_prod.id
 
   # Terraform Cloud Agent configuration
-  tfc_agent_vpc_id         = ""
+  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
   tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
 
   # Use shared PHZ instead of creating own

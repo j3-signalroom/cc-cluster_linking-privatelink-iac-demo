@@ -55,9 +55,13 @@ locals {
 # VPC ASSOCIATIONS
 # ============================================================================
 #
-# Associate the PHZ with the local VPC (only if using existing PHZ)
+# Associate the PHZ with the local VPC (only if using existing PHZ AND not TFC agent VPC)
 resource "aws_route53_zone_association" "local_vpc" {
-  count = var.shared_phz_id != "" ? 1 : 0
+  count = (
+    var.shared_phz_id != "" && 
+    var.vpc_id != var.tfc_agent_vpc_id &&
+    var.vpc_id != var.dns_vpc_id
+  ) ? 1 : 0
   
   zone_id = local.shared_phz_id
   vpc_id  = var.vpc_id
