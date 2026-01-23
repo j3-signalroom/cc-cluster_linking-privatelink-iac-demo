@@ -86,7 +86,7 @@ module "sandbox_vpc_privatelink" {
   vpn_client_cidr          = var.vpn_client_cidr
 
   # DNS VPC configuration
-  dns_vpc_id               = var.dns_vpc_id
+  dns_vpc_id               = ""
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
@@ -128,7 +128,7 @@ module "shared_vpc_privatelink" {
   vpn_client_cidr          = var.vpn_client_cidr
 
   # DNS VPC configuration
-  dns_vpc_id               = var.dns_vpc_id
+  dns_vpc_id               = ""
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
@@ -230,8 +230,7 @@ resource "time_sleep" "wait_for_dns" {
   depends_on = [
     module.sandbox_vpc_privatelink,
     module.shared_vpc_privatelink,
-    aws_route53_record.sandbox_zonal,
-    aws_route53_record.shared_zonal,
+    aws_route53_record.zonal,
     aws_route53_record.wildcard,
     aws_route.tfc_to_sandbox_privatelink,
     aws_route.tfc_to_shared_privatelink

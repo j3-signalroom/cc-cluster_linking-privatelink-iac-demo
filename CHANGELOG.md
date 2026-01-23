@@ -11,6 +11,9 @@ The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 ### Changed
 - Issue [`#111`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/111)
 
+### Fixed
+- Issue [`#115`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/115)
+
 ## [0.05.00.000] - 2026-01-19
 ### Added
 - Issue [`#103`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/103)
