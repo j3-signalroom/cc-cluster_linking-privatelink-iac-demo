@@ -147,41 +147,11 @@ module "shared_vpc_privatelink" {
 }
 
 # ===================================================================================
-# DNS RECORDS FOR BOTH VPC ENDPOINTS (Managed at Root Level)
+# DNS RECORDS - ONLY FOR PRIMARY (SHARED) VPC ENDPOINT
 # ===================================================================================
-
-# Sandbox VPC Endpoint DNS Records
-resource "aws_route53_record" "sandbox_zonal" {
-  for_each = module.sandbox_vpc.vpc_subnet_details
-  
-  zone_id = aws_route53_zone.confluent_privatelink.zone_id
-  name    = "*.${each.value.availability_zone_id}.${confluent_private_link_attachment.non_prod.dns_domain}"
-  type    = "CNAME"
-  ttl     = 60
-  
-  records = [
-    format("%s-%s%s",
-      split(".", module.sandbox_vpc_privatelink.vpc_endpoint_dns)[0],
-      each.value.availability_zone,
-      replace(
-        module.sandbox_vpc_privatelink.vpc_endpoint_dns,
-        split(".", module.sandbox_vpc_privatelink.vpc_endpoint_dns)[0],
-        ""
-      )
-    )
-  ]
-  
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [ 
-    module.sandbox_vpc_privatelink
-  ]
-}
-
-# Shared VPC Endpoint DNS Records
-resource "aws_route53_record" "shared_zonal" {
+#
+# Primary zonal records pointing to Shared VPC endpoint
+resource "aws_route53_record" "zonal" {
   for_each = module.shared_vpc.vpc_subnet_details
   
   zone_id = aws_route53_zone.confluent_privatelink.zone_id
@@ -210,7 +180,7 @@ resource "aws_route53_record" "shared_zonal" {
   ]
 }
 
-# Global wildcard CNAME pointing to Shared VPC endpoint (as primary)
+# Global wildcard CNAME pointing to Shared VPC endpoint
 resource "aws_route53_record" "wildcard" {
   zone_id = aws_route53_zone.confluent_privatelink.zone_id
   name    = "*.${confluent_private_link_attachment.non_prod.dns_domain}"
