@@ -74,11 +74,6 @@ variable "tfc_agent_vpc_cidr" {
   type        = string
 }
 
-variable "dns_vpc_id" {
-  description = "Enterprise (centralized) DNS VPC ID - Private Hosted Zones will be associated with this VPC"
-  type        = string
-}
-
 variable "shared_phz_id" {
   description = "Optional: Existing Route53 Private Hosted Zone ID. If provided, the module will use this instead of creating a new one. Leave empty to create a new PHZ."
   type        = string

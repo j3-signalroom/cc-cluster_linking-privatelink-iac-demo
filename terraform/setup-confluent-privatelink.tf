@@ -63,6 +63,20 @@ resource "aws_route53_zone" "confluent_privatelink" {
 }
 
 # ===================================================================================
+# CENTRALIZED DNS VPC ASSOCIATION (For Client VPN)
+# ===================================================================================
+resource "aws_route53_zone_association" "centralized_dns_vpc" {
+  count = var.dns_vpc_id != "" && var.dns_vpc_id != var.tfc_agent_vpc_id ? 1 : 0
+  
+  zone_id = aws_route53_zone.confluent_privatelink.zone_id
+  vpc_id  = var.dns_vpc_id
+  
+  lifecycle {
+    ignore_changes = [vpc_id]  # Prevent recreation if already associated
+  }
+}
+
+# ===================================================================================
 # SANDBOX PRIVATELINK MODULE
 # ===================================================================================
 module "sandbox_vpc_privatelink" {
@@ -84,9 +98,6 @@ module "sandbox_vpc_privatelink" {
 
   # VPN Client configuration
   vpn_client_cidr          = var.vpn_client_cidr
-
-  # DNS VPC configuration
-  dns_vpc_id               = ""
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
@@ -126,9 +137,6 @@ module "shared_vpc_privatelink" {
 
   # VPN Client configuration
   vpn_client_cidr          = var.vpn_client_cidr
-
-  # DNS VPC configuration
-  dns_vpc_id               = ""
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id

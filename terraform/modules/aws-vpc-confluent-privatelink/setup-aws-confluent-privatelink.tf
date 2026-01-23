@@ -66,26 +66,10 @@ resource "aws_route53_zone_association" "local_vpc" {
   vpc_id  = var.vpc_id
 }
 
-# Associate the PHZ with the DNS VPC, if provided
-resource "aws_route53_zone_association" "dns_vpc" {
-  count = (
-    var.dns_vpc_id != "" && 
-    var.dns_vpc_id != var.tfc_agent_vpc_id
-  ) ? 1 : 0
-
-  zone_id = local.shared_phz_id
-  vpc_id  = var.dns_vpc_id
-
-  depends_on = [ 
-    aws_route53_zone.privatelink,
-    aws_route53_zone_association.local_vpc
-  ]
-}
-
 # Wait for DNS propagation
 resource "time_sleep" "wait_for_zone_associations" {
   depends_on = [
-    aws_route53_zone_association.dns_vpc
+    aws_route53_zone_association.local_vpc
   ]
   
   create_duration = "3m"
