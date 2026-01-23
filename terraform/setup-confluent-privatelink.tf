@@ -166,6 +166,8 @@ resource "aws_route53_record" "zonal" {
   name    = "*.${each.value.availability_zone_id}.${confluent_private_link_attachment.non_prod.dns_domain}"
   type    = "CNAME"
   ttl     = 60
+
+  allow_overwrite = true
   
   records = [
     format("%s-%s%s",
@@ -195,6 +197,8 @@ resource "aws_route53_record" "wildcard" {
   type    = "CNAME"
   ttl     = 60
   records = [module.shared_vpc_privatelink.vpc_endpoint_dns]
+  
+  allow_overwrite = true
 
   depends_on = [ 
     module.shared_vpc_privatelink

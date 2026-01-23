@@ -4,27 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.06.00.000] - TBD
-### Added
-- Issue [`#113`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/113)
-
-### Changed
-- Issue [`#111`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/111)
-
-### Fixed
-- Issue [`#115`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/115)
-- Issue [`#119`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/119)
-- Issue [`#121`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/121)
-
-## [0.05.00.000] - 2026-01-19
+## [0.05.00.000] - TBD
 ### Added
 - Issue [`#103`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/103)
+- Issue [`#113`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/113)
 
 ### Changed
 - Issue [`#99`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/99)
 - Issue [`#101`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/101)
 - Issue [`#104`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/104)
 - Issue [`#107`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/107)
+- Issue [`#111`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/111)
+
+### Fixed
+- Issue [`#115`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/115)
+- Issue [`#119`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/119)
+- Issue [`#121`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/121)
+- Issue [`#123`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/123)
 
 ## [0.04.00.000] - 2026-01-16
 ### Added
