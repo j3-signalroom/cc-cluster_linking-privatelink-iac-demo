@@ -154,34 +154,30 @@ module "shared_vpc_privatelink" {
   ]
 }
 
-# Add to your TFC Agent VPC route table
+# ===================================================================================
+# TFC AGENT VPC ROUTES TO PRIVATELINK VPCS
+# ===================================================================================
+# Routes from TFC Agent VPC to Sandbox VPC (10.0.0.0/20)
 resource "aws_route" "tfc_agent_to_snapshot_privatelink" {
-  count                  = length(var.tfc_agent_vpc_rt_ids)
+  for_each = toset(var.tfc_agent_vpc_rt_ids)
   
-  route_table_id         = var.tfc_agent_vpc_rt_ids[count.index]
+  route_table_id         = each.value
   destination_cidr_block = "10.0.0.0/20"
   transit_gateway_id     = var.tgw_id
-
-  lifecycle {
-    ignore_changes = [route_table_id]
-  }
-
+  
   depends_on = [
     module.sandbox_vpc_privatelink
   ]
 }
 
+# Routes from TFC Agent VPC to Shared VPC (10.1.0.0/20)
 resource "aws_route" "tfc_agent_to_shared_privatelink" {
-  count                  = length(var.tfc_agent_vpc_rt_ids)
+  for_each = toset(var.tfc_agent_vpc_rt_ids)
   
-  route_table_id         = var.tfc_agent_vpc_rt_ids[count.index]
+  route_table_id         = each.value
   destination_cidr_block = "10.1.0.0/20"
   transit_gateway_id     = var.tgw_id
-
-  lifecycle {
-    ignore_changes = [route_table_id]
-  }
-
+  
   depends_on = [
     module.shared_vpc_privatelink
   ]

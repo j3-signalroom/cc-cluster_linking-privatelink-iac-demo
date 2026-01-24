@@ -292,7 +292,7 @@ deploy_infrastructure() {
 
     # Initialize Terraform if needed
     print_info "Initializing Terraform..."
-    terraform init
+    # terraform init
 
     # Plan
     print_info "Running Terraform plan..."
