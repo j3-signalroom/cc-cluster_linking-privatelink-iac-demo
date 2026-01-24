@@ -161,6 +161,14 @@ resource "aws_route" "tfc_agent_to_snapshot_privatelink" {
   route_table_id         = var.tfc_agent_vpc_rt_ids[count.index]
   destination_cidr_block = "10.0.0.0/20"
   transit_gateway_id     = var.tgw_id
+
+  lifecycle {
+    ignore_changes = [route_table_id]
+  }
+
+  depends_on = [
+    module.sandbox_vpc_privatelink
+  ]
 }
 
 resource "aws_route" "tfc_agent_to_shared_privatelink" {
@@ -169,6 +177,14 @@ resource "aws_route" "tfc_agent_to_shared_privatelink" {
   route_table_id         = var.tfc_agent_vpc_rt_ids[count.index]
   destination_cidr_block = "10.1.0.0/20"
   transit_gateway_id     = var.tgw_id
+
+  lifecycle {
+    ignore_changes = [route_table_id]
+  }
+
+  depends_on = [
+    module.shared_vpc_privatelink
+  ]
 }
 
 # ===================================================================================
