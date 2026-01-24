@@ -155,6 +155,35 @@ module "shared_vpc_privatelink" {
 }
 
 # ===================================================================================
+# TFC AGENT VPC ROUTES TO PRIVATELINK VPCS
+# ===================================================================================
+# Routes from TFC Agent VPC to Sandbox VPC (10.0.0.0/20)
+resource "aws_route" "tfc_agent_to_snapshot_privatelink" {
+  for_each = toset(var.tfc_agent_vpc_rt_ids)
+  
+  route_table_id         = each.value
+  destination_cidr_block = "10.0.0.0/20"
+  transit_gateway_id     = var.tgw_id
+  
+  depends_on = [
+    module.sandbox_vpc_privatelink
+  ]
+}
+
+# Routes from TFC Agent VPC to Shared VPC (10.1.0.0/20)
+resource "aws_route" "tfc_agent_to_shared_privatelink" {
+  for_each = toset(var.tfc_agent_vpc_rt_ids)
+  
+  route_table_id         = each.value
+  destination_cidr_block = "10.1.0.0/20"
+  transit_gateway_id     = var.tgw_id
+  
+  depends_on = [
+    module.shared_vpc_privatelink
+  ]
+}
+
+# ===================================================================================
 # DNS RECORDS - ONLY FOR PRIMARY (SHARED) VPC ENDPOINT
 # ===================================================================================
 #
@@ -206,47 +235,17 @@ resource "aws_route53_record" "wildcard" {
 }
 
 # ===================================================================================
-# TFC AGENT VPC ROUTES
-# ===================================================================================
-data "aws_route_tables" "tfc_agent" {
-  vpc_id = var.tfc_agent_vpc_id
-  
-  filter {
-    name   = "association.main"
-    values = ["false"]
-  }
-}
-
-# Add routes to Sandbox PrivateLink VPC
-resource "aws_route" "tfc_to_sandbox_privatelink" {
-  for_each = toset(data.aws_route_tables.tfc_agent.ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.0.0.0/20"
-  transit_gateway_id     = var.tgw_id
-}
-
-# Add routes to Shared PrivateLink VPC
-resource "aws_route" "tfc_to_shared_privatelink" {
-  for_each = toset(data.aws_route_tables.tfc_agent.ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.1.0.0/20"
-  transit_gateway_id     = var.tgw_id
-}
-
-# ===================================================================================
 # WAIT FOR DNS PROPAGATION
 # ===================================================================================
 resource "time_sleep" "wait_for_dns" {
   depends_on = [
     module.sandbox_vpc_privatelink,
     module.shared_vpc_privatelink,
+    aws_route.tfc_agent_to_snapshot_privatelink,
+    aws_route.tfc_agent_to_shared_privatelink,
     aws_route53_record.zonal,
-    aws_route53_record.wildcard,
-    aws_route.tfc_to_sandbox_privatelink,
-    aws_route.tfc_to_shared_privatelink
+    aws_route53_record.wildcard
   ]
   
-  create_duration = "3m"
+  create_duration = "1m"
 }

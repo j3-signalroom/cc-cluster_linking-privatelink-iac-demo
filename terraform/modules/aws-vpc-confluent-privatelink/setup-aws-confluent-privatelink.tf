@@ -25,7 +25,7 @@ resource "aws_vpc_endpoint" "privatelink" {
 # ============================================================================
 
 resource "aws_route53_zone" "privatelink" {
-  count = var.shared_phz_id == "" ? 1 : 0
+  count = var.create_phz ? 1 : 0
   
   name = var.dns_domain
   
@@ -43,12 +43,12 @@ resource "aws_route53_zone" "privatelink" {
 
 # Data source for existing PHZ (when shared_phz_id is provided)
 data "aws_route53_zone" "existing" {
-  count   = var.shared_phz_id != "" ? 1 : 0
+  count   = var.create_phz ? 0 : 1
   zone_id = var.shared_phz_id
 }
 
 locals {
-  shared_phz_id = var.shared_phz_id != "" ? var.shared_phz_id : aws_route53_zone.privatelink[0].zone_id  
+  shared_phz_id = var.create_phz ? aws_route53_zone.privatelink[0].zone_id : data.aws_route53_zone.existing[0].zone_id
 }
 
 # ============================================================================
@@ -57,10 +57,7 @@ locals {
 #
 # Associate the PHZ with the local VPC (only if using existing PHZ AND not TFC agent VPC)
 resource "aws_route53_zone_association" "local_vpc" {
-  count = (
-    var.shared_phz_id != "" && 
-    var.vpc_id != var.tfc_agent_vpc_id
-  ) ? 1 : 0
+  count   = var.create_phz ? 0 : 1
   
   zone_id = local.shared_phz_id
   vpc_id  = var.vpc_id
@@ -72,7 +69,7 @@ resource "time_sleep" "wait_for_zone_associations" {
     aws_route53_zone_association.local_vpc
   ]
   
-  create_duration = "3m"
+  create_duration = "1m"
 }
 
 resource "confluent_private_link_attachment_connection" "privatelink" {

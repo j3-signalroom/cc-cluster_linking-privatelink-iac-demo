@@ -4,5 +4,6 @@ data "confluent_environment" "privatelink" {
 }
 
 locals {
+  # Extract network ID from DNS domain
   network_id = split(".", var.dns_domain)[0]
 }

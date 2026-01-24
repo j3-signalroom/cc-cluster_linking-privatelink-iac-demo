@@ -17,7 +17,7 @@ resource "time_sleep" "wait_for_shared_dns" {
     module.shared_vpc_privatelink,
   ]
 
-  create_duration = "3m"
+  create_duration = "1m"
 }
 
 resource "confluent_service_account" "shared_cluster_app_manager" {

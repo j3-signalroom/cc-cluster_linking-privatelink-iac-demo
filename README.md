@@ -38,3 +38,14 @@ Below is the Terraform resource visualization of the infrastructure that's creat
 - [GitHub Sample Project for Confluent Terraform Provider PrivateLink Attachment](https://github.com/confluentinc/terraform-provider-confluent/tree/master/examples/configurations/enterprise-privatelinkattachment-aws-kafka-acls)
 - [Geo-replication with Cluster Linking on Confluent Cloud](https://docs.confluent.io/cloud/current/multi-cloud/cluster-linking/index.html#geo-replication-with-cluster-linking-on-ccloud)
 - [Use the Confluent Cloud Console with Private Networking](https://docs.confluent.io/cloud/current/networking/ccloud-console-access.html?ajs_aid=9a5807f8-b35a-447c-a414-b31dd39ae98a&ajs_uid=2984609)
+
+
+This command can be used to verify that the appropriate routes have been added to the Terraform Cloud Agent VPC route tables:
+```bash
+(echo -e "RouteTableId\tDestination\tGateway\tTransitGateway\tState"; \
+aws ec2 describe-route-tables \
+  --filters "Name=vpc-id,Values=<TFC_AGENT_VPC_ID>" \
+  --output json | jq -r '.RouteTables[] | . as $rt | .Routes[] | 
+  [$rt.RouteTableId, .DestinationCidrBlock, .GatewayId, .TransitGatewayId, .State] | @tsv') | \
+  column -t -s $'\t'
+```

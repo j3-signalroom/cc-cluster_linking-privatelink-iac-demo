@@ -77,4 +77,11 @@ variable "tfc_agent_vpc_cidr" {
 variable "shared_phz_id" {
   description = "Optional: Existing Route53 Private Hosted Zone ID. If provided, the module will use this instead of creating a new one. Leave empty to create a new PHZ."
   type        = string
+  default     = null
+}
+
+variable "create_phz" {
+  type        = bool
+  description = "Whether to create a new PHZ or use existing"
+  default     = true
 }
