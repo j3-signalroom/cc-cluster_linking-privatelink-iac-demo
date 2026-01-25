@@ -43,9 +43,9 @@ variable "vpc_cidr" {
   type        = string
 }
 
-variable "vpc_rt_id" {
-  description = "VPC Route Table ID"
-  type        = string
+variable "vpc_rt_ids" {
+  description = "List of private route table IDs"
+  type        = list(string)
 }
 
 variable "vpc_subnet_details" {
@@ -59,8 +59,13 @@ variable "vpc_subnet_details" {
   }))
 }
 
-variable "vpn_client_cidr" {
-  description = "VPN Client CIDR"
+variable "vpn_client_vpc_cidr" {
+  description = "VPN Client VPC CIDR"
+  type        = string
+}
+
+variable "vpn_vpc_cidr" {
+  description = "VPN VPC CIDR"
   type        = string
 }
 

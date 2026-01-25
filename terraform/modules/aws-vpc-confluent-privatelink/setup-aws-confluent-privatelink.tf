@@ -128,9 +128,9 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "privatelink" {
 #
 # Add route to TFC Agent VPC via Transit Gateway
 resource "aws_route" "privatelink_to_tfc_agent" {
-  count = var.tfc_agent_vpc_cidr != "" ? 1 : 0
+  for_each = toset(var.vpc_rt_ids)
   
-  route_table_id         = var.vpc_rt_id
+  route_table_id         = each.value
   destination_cidr_block = var.tfc_agent_vpc_cidr
   transit_gateway_id     = var.tgw_id
 
@@ -141,10 +141,10 @@ resource "aws_route" "privatelink_to_tfc_agent" {
 
 # Add route to VPN clients via Transit Gateway
 resource "aws_route" "privatelink_to_vpn_client" {
-  count = var.vpn_client_cidr != "" ? 1 : 0
+  for_each = toset(var.vpc_rt_ids)
   
-  route_table_id         = var.vpc_rt_id
-  destination_cidr_block = var.vpn_client_cidr
+  route_table_id         = each.value
+  destination_cidr_block = var.vpn_client_vpc_cidr
   transit_gateway_id     = var.tgw_id
 
   depends_on = [
@@ -177,7 +177,7 @@ resource "aws_security_group_rule" "allow_https" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
 
@@ -187,6 +187,6 @@ resource "aws_security_group_rule" "allow_kafka" {
   from_port         = 9092
   to_port           = 9092
   protocol          = "tcp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }

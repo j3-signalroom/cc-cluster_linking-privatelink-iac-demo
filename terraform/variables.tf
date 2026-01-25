@@ -121,10 +121,21 @@ variable "tgw_rt_id" {
 }
 
 # ===================================================
-# VPN CLIENT VPC CONFIGURATION
+# VPN VPC CONFIGURATION
 # ===================================================
-variable "vpn_client_cidr" {
-  description = "VPN Client CIDR"
+variable "vpn_vpc_id" {
+  description = "VPN Client VPC ID - Private Hosted Zones will be associated with this VPC"
+  type        = string
+  default     = "vpc-05946aab047008805"
+}
+
+variable "vpn_client_vpc_cidr" {
+  description = "VPN Client VPC CIDR"
+  type        = string
+}
+
+variable "vpn_vpc_cidr" {
+  description = "VPN VPC CIDR"
   type        = string
 }
 

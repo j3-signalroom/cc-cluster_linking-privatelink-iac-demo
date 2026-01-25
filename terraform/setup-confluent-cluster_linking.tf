@@ -109,6 +109,34 @@ resource "confluent_cluster_link" "sandbox_and_shared" {
   ]
 }
 
+# Reverse link: Shared -> Sandbox (required for bidirectional mode)
+resource "confluent_cluster_link" "shared_to_sandbox" {
+  link_name = "bidirectional-between-sandbox-and-shared"
+  link_mode = "BIDIRECTIONAL"
+  
+  local_kafka_cluster {
+    id            = confluent_kafka_cluster.shared_cluster.id
+    rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
+    credentials {
+      key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
+      secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
+    }
+  }
+
+  remote_kafka_cluster {
+    id                 = confluent_kafka_cluster.sandbox_cluster.id
+    bootstrap_endpoint = confluent_kafka_cluster.sandbox_cluster.bootstrap_endpoint
+    credentials {
+      key    = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.id
+      secret = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.secret
+    }
+  }
+
+  depends_on = [
+    confluent_cluster_link.sandbox_and_shared
+  ]
+}
+
 resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
   source_kafka_topic {
     topic_name = confluent_kafka_topic.source_stock_trades.topic_name 
@@ -128,6 +156,6 @@ resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
   }
 
   depends_on = [ 
-    confluent_cluster_link.sandbox_and_shared
+    confluent_cluster_link.shared_to_sandbox
   ]
 }

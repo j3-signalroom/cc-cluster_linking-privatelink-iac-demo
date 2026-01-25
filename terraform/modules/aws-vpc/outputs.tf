@@ -37,6 +37,11 @@ output "vpc_rt_id" {
   value       = aws_route_table.private.id
 }
 
+output "vpc_rt_ids" {
+  description = "List of private route table IDs"
+  value       = aws_route_table.private[*].id
+}
+
 output "route_table_association_ids" {
   description = "List of route table association IDs"
   value       = aws_route_table_association.private[*].id

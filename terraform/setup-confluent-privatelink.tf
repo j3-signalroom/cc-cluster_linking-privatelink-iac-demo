@@ -63,17 +63,23 @@ resource "aws_route53_zone" "confluent_privatelink" {
 }
 
 # ===================================================================================
-# CENTRALIZED DNS VPC ASSOCIATION (For Client VPN)
+# PRIVATE HOSTED ZONE VPC ASSOCIATIONS
 # ===================================================================================
-resource "aws_route53_zone_association" "centralized_dns_vpc" {
+#
+# Association with DNS VPC (for centralized DNS)
+resource "aws_route53_zone_association" "dns_vpc" {
   count = var.dns_vpc_id != "" && var.dns_vpc_id != var.tfc_agent_vpc_id ? 1 : 0
   
   zone_id = aws_route53_zone.confluent_privatelink.zone_id
   vpc_id  = var.dns_vpc_id
+}
+
+# Association with VPN VPC (for VPN client connectivity)
+resource "aws_route53_zone_association" "vpn_vpc" {
+  count = var.vpn_vpc_id != "" && var.vpn_vpc_id != var.tfc_agent_vpc_id ? 1 : 0
   
-  lifecycle {
-    ignore_changes = [vpc_id]  # Prevent recreation if already associated
-  }
+  zone_id = aws_route53_zone.confluent_privatelink.zone_id
+  vpc_id  = var.vpn_vpc_id
 }
 
 # ===================================================================================
@@ -94,10 +100,11 @@ module "sandbox_vpc_privatelink" {
   vpc_id                   = module.sandbox_vpc.vpc_id
   vpc_cidr                 = module.sandbox_vpc.vpc_cidr
   vpc_subnet_details       = module.sandbox_vpc.vpc_subnet_details
-  vpc_rt_id                = module.sandbox_vpc.vpc_rt_id
+  vpc_rt_ids               = module.sandbox_vpc.vpc_rt_ids
 
-  # VPN Client configuration
-  vpn_client_cidr          = var.vpn_client_cidr
+  # VPN configuration
+  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr             = var.vpn_vpc_cidr
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
@@ -133,10 +140,11 @@ module "shared_vpc_privatelink" {
   vpc_id                   = module.shared_vpc.vpc_id
   vpc_cidr                 = module.shared_vpc.vpc_cidr
   vpc_subnet_details       = module.shared_vpc.vpc_subnet_details
-  vpc_rt_id                = module.shared_vpc.vpc_rt_id
+  vpc_rt_ids               = module.shared_vpc.vpc_rt_ids
 
-  # VPN Client configuration
-  vpn_client_cidr          = var.vpn_client_cidr
+  # VPN configuration
+  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr             = var.vpn_vpc_cidr
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
