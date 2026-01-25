@@ -311,6 +311,8 @@ deploy_infrastructure() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_info "Applying Terraform plan..."
+
+        # Stage 3 Apply: Apply the rest of the infrastructure
         terraform apply tfplan
         rm tfplan
         print_info "Infrastructure deployed successfully!"

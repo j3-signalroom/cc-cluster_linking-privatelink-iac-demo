@@ -4,7 +4,7 @@ resource "aws_vpc" "privatelink" {
   enable_dns_support   = true
 
   tags = {
-    Name        = "${var.vpc_name}-vpc"
+    Name = var.vpc_name
   }
 }
 
@@ -17,6 +17,7 @@ resource "aws_subnet" "private" {
 
   tags = {
     Name          = "${var.vpc_name}-private-subnet-${count.index + 1}"
+    Type          = "private"
     AvailableZone = local.available_zones[count.index]
   }
 }

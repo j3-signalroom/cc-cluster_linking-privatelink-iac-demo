@@ -100,7 +100,7 @@ module "sandbox_vpc_privatelink" {
   vpc_id                   = module.sandbox_vpc.vpc_id
   vpc_cidr                 = module.sandbox_vpc.vpc_cidr
   vpc_subnet_details       = module.sandbox_vpc.vpc_subnet_details
-  vpc_rt_ids               = module.sandbox_vpc.vpc_rt_ids
+  vpc_rt_ids               = ["rtb-02818726efd3a458f", "rtb-01fd54c13b6686052"]
 
   # VPN configuration
   vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
@@ -140,8 +140,8 @@ module "shared_vpc_privatelink" {
   vpc_id                   = module.shared_vpc.vpc_id
   vpc_cidr                 = module.shared_vpc.vpc_cidr
   vpc_subnet_details       = module.shared_vpc.vpc_subnet_details
-  vpc_rt_ids               = module.shared_vpc.vpc_rt_ids
-
+  vpc_rt_ids               = ["rtb-0055430d78350e02c", "rtb-07a542474ab95dbe2"]
+  
   # VPN configuration
   vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
   vpn_vpc_cidr             = var.vpn_vpc_cidr

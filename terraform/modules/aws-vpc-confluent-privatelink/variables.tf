@@ -44,7 +44,7 @@ variable "vpc_cidr" {
 }
 
 variable "vpc_rt_ids" {
-  description = "List of private route table IDs"
+  description = "List of VPC Route Table IDs to add routes to for Transit Gateway connectivity"
   type        = list(string)
 }
 
