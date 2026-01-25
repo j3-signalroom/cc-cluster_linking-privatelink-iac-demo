@@ -352,6 +352,7 @@ undeploy_infrastructure() {
     export TF_VAR_tfc_agent_vpc_cidr="${tfc_agent_vpc_cidr}"
     export TF_VAR_vpn_client_vpc_cidr="${vpn_client_vpc_cidr}"
     export TF_VAR_vpn_vpc_cidr="${vpn_vpc_cidr}"
+    export TF_VAR_tgw_id="${tgw_id}"
     export TF_VAR_tgw_rt_id="${tgw_rt_id}"
 
     # Destroy

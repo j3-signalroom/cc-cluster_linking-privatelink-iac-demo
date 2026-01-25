@@ -32,11 +32,6 @@ output "private_subnet_az_ids" {
   value       = aws_subnet.private[*].availability_zone_id
 }
 
-output "vpc_rt_id" {
-  description = "Private route table ID"
-  value       = aws_route_table.private.id
-}
-
 output "vpc_rt_ids" {
   description = "List of private route table IDs"
   value       = aws_route_table.private[*].id
