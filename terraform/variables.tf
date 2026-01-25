@@ -127,3 +127,12 @@ variable "vpn_client_cidr" {
   description = "VPN Client CIDR"
   type        = string
 }
+
+variable "vpn_client_vpc_rt_ids" {
+  description = "List of route table IDs for VPN Client VPC"
+  type        = list(string)
+  default     = [
+    "rtb-03864e3b099d45c70",
+    "rtb-0a872eae8a88644af"
+  ]
+}
