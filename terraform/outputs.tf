@@ -9,9 +9,14 @@ output "sandbox_dns_domain" {
   description = "Sandbox PrivateLink DNS domain (e.g., abc123.us-east-1.aws.private.confluent.cloud)"
 }
 
-output "shared_phz_id" {
+output "shared_privatelink_phz_id" {
   description = "Shared Private Hosted Zone ID"
-  value       = aws_route53_zone.confluent_privatelink.zone_id
+  value       = aws_route53_zone.shared_privatelink.zone_id
+}
+
+output "sandbox_privatelink_phz_id" {
+  description = "Sandbox Private Hosted Zone ID"
+  value       = aws_route53_zone.sandbox_privatelink.zone_id
 }
 
 output "sandbox_vpc_endpoint_id" {

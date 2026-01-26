@@ -329,8 +329,10 @@ resource "time_sleep" "wait_for_dns" {
     aws_route53_record.sandbox_wildcard,
     aws_route53_record.shared_zonal,
     aws_route53_record.shared_wildcard,
-    aws_route.tfc_agent_to_sandbox,
-    aws_route.tfc_agent_to_shared
+    aws_route.tfc_agent_to_sandbox_privatelink,
+    aws_route.tfc_agent_to_shared_privatelink,
+    aws_route.vpn_to_sandbox_privatelink,
+    aws_route.vpn_to_shared_privatelink
   ]
   
   create_duration = "2m"

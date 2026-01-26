@@ -7,7 +7,7 @@ resource "confluent_kafka_cluster" "sandbox_cluster" {
   enterprise   {}
   
   environment {
-    id = confluent_environment.non_prod.id
+    id = confluent_environment.sandbox.id
   }
 }
 
@@ -46,7 +46,7 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.non_prod.id
+      id = confluent_environment.sandbox.id
     }
   }
 
@@ -80,7 +80,7 @@ resource "confluent_kafka_topic" "source_stock_trades" {
 
 resource "confluent_service_account" "sandbox_cluster_app_consumer" {
   display_name = "sandbox_cluster_app_consumer"
-  description  = "AWS PrivateLink Example Service account to consume from 'stock_trades' topic of Kafka cluster source"
+  description  = "Sandbox AWS PrivateLink Service account to consume from 'stock_trades' topic of Kafka cluster source"
 }
 
 module "kafka_sandbox_cluster_app_consumer_api_key" {
@@ -99,7 +99,7 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.non_prod.id
+      id = confluent_environment.sandbox.id
     }
   }
 
@@ -144,7 +144,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_producer_prefix_acls" {
 
 resource "confluent_service_account" "sandbox_cluster_app_producer" {
   display_name = "sandbox_cluster_app_producer"
-  description  = "AWS PrivateLink Example Service account to produce to 'stock_trades' topic of Kafka cluster source"
+  description  = "Cluster Linking Demo Service account to produce to 'stock_trades' topic of Kafka cluster source"
 }
 
 module "kafka_sandbox_cluster_app_producer_api_key" {
@@ -163,7 +163,7 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.non_prod.id
+      id = confluent_environment.sandbox.id
     }
   }
 
@@ -183,7 +183,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_consumer_read_on_group" {
     id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "GROUP"
-  resource_name = "aws_privatelink_example"
+  resource_name = "sandbox_aws_privatelink_example_"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.sandbox_cluster_app_consumer.id}"
   host          = "*"
@@ -276,7 +276,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_create_on_data_pre
     id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
-  resource_name = "aws_privatelink_example"
+  resource_name = "sandbox_aws_privatelink_example_"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.sandbox_cluster_app_connector.id}"
   host          = "*"
@@ -298,7 +298,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
     id = confluent_kafka_cluster.sandbox_cluster.id
   }
   resource_type = "TOPIC"
-  resource_name = "aws_privatelink_example"
+  resource_name = "sandbox_aws_privatelink_example_"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.sandbox_cluster_app_connector.id}"
   host          = "*"
@@ -317,7 +317,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
 
 resource "confluent_connector" "source" {
   environment {
-    id = confluent_environment.non_prod.id
+    id = confluent_environment.sandbox.id
   }
   kafka_cluster {
     id = confluent_kafka_cluster.sandbox_cluster.id
@@ -327,7 +327,7 @@ resource "confluent_connector" "source" {
 
   config_nonsensitive = {
     "connector.class"          = "DatagenSource"
-    "name"                     = "aws_privatelink_example_source_datagen_connector"
+    "name"                     = "sanbox_aws_privatelink_example_source_datagen_connector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
     "kafka.service.account.id" = confluent_service_account.sandbox_cluster_app_connector.id
     "kafka.topic"              = confluent_kafka_topic.source_stock_trades.topic_name

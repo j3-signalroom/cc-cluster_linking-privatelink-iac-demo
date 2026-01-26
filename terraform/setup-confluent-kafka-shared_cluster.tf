@@ -7,7 +7,7 @@ resource "confluent_kafka_cluster" "shared_cluster" {
   enterprise   {}
   
   environment {
-    id = confluent_environment.non_prod.id
+    id = confluent_environment.shared.id
   }
 }
 
@@ -54,7 +54,7 @@ module "kafka_shared_cluster_app_manager_api_key" {
     kind        = confluent_kafka_cluster.shared_cluster.kind
 
     environment = {
-      id = confluent_environment.non_prod.id
+      id = confluent_environment.shared.id
     }
   }
 
@@ -90,7 +90,7 @@ module "kafka_shared_cluster_app_consumer_api_key" {
     kind        = confluent_kafka_cluster.shared_cluster.kind
 
     environment = {
-      id = confluent_environment.non_prod.id
+      id = confluent_environment.shared.id
     }
   }
 
@@ -111,7 +111,7 @@ resource "confluent_kafka_acl" "shared_cluster_app_consumer_read_on_group" {
     id = confluent_kafka_cluster.shared_cluster.id
   }
   resource_type = "GROUP"
-  resource_name = "aws_privatelink_example_"
+  resource_name = "shared_aws_privatelink_example_"
   pattern_type  = "LITERAL"
   principal     = "User:${confluent_service_account.shared_cluster_app_consumer.id}"
   host          = "*"
