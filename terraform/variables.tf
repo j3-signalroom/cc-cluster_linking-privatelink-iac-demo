@@ -103,8 +103,8 @@ variable "sandbox_vpc_rt_ids" {
   description = "List of route table IDs for Sandbox VPC"
   type        = list(string)
   default     = [
-    "rtb-02818726efd3a458f",
-    "rtb-01fd54c13b6686052"
+    "rtb-0a2b0c6c639127213",
+    "rtb-06ca2da99c1fb7b65"
   ]
 }
 
@@ -112,8 +112,8 @@ variable "shared_vpc_rt_ids" {
   description = "List of route table IDs for Shared VPC"
   type        = list(string)
   default     = [
-    "rtb-0055430d78350e02c", 
-    "rtb-07a542474ab95dbe2"
+    "rtb-03d6d850a95b4a12a", 
+    "rtb-08f845b4c1815b182"
   ]
 }
 

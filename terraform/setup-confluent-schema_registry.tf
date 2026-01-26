@@ -1,16 +1,16 @@
 # Wait for DNS propagation
 resource "time_sleep" "wait_for_stream_governance" {
   depends_on = [
-    confluent_environment.sandbox
+    confluent_environment.non_prod
   ]
   
   create_duration = "1m"
 }
 
 # Config the environment's schema registry
-data "confluent_schema_registry_cluster" "sandbox_src" {
+data "confluent_schema_registry_cluster" "src" {
   environment {
-    id = confluent_environment.sandbox.id
+    id = confluent_environment.non_prod.id
   }
 
   depends_on = [
@@ -19,31 +19,31 @@ data "confluent_schema_registry_cluster" "sandbox_src" {
 }
 
 # Create the Service Account for the Kafka Cluster API
-resource "confluent_service_account" "sandbox_src_api" {
-    display_name = "sandbox_src_api"
-    description  = "Sandbox Cluster Sharing Schema Registry Cluster API Service Account"
+resource "confluent_service_account" "src_api" {
+    display_name = "src_api"
+    description  = "Cluster Sharing Schema Registry Cluster API Service Account"
 }
 
 # Create the Environment API Key Pairs, rotate them in accordance to a time schedule, and provide the current
 # acitve API Key Pair to use
-module "sandbox_src_api_key_rotation" {
+module "src_api_key_rotation" {
     
     source  = "github.com/j3-signalroom/iac-confluent-api_key_rotation-tf_module"
 
     # Required Input(s)
     owner = {
-        id          = confluent_service_account.sandbox_src_api.id
-        api_version = confluent_service_account.sandbox_src_api.api_version
-        kind        = confluent_service_account.sandbox_src_api.kind
+        id          = confluent_service_account.src_api.id
+        api_version = confluent_service_account.src_api.api_version
+        kind        = confluent_service_account.src_api.kind
     }
 
     resource = {
-        id          = data.confluent_schema_registry_cluster.sandbox_src.id
-        api_version = data.confluent_schema_registry_cluster.sandbox_src.api_version
-        kind        = data.confluent_schema_registry_cluster.sandbox_src.kind
+        id          = data.confluent_schema_registry_cluster.src.id
+        api_version = data.confluent_schema_registry_cluster.src.api_version
+        kind        = data.confluent_schema_registry_cluster.src.kind
 
         environment = {
-            id = confluent_environment.sandbox.id
+            id = confluent_environment.non_prod.id
         }
     }
     
@@ -54,23 +54,23 @@ module "sandbox_src_api_key_rotation" {
 }
 
 resource "confluent_role_binding" "schema_registry_developer_read_all_subjects" {
-  principal   = "User:${confluent_service_account.sandbox_src_api.id}"
+  principal   = "User:${confluent_service_account.src_api.id}"
   role_name   = "DeveloperRead"
-  crn_pattern = "${data.confluent_schema_registry_cluster.sandbox_src.resource_name}/subject=*"
+  crn_pattern = "${data.confluent_schema_registry_cluster.src.resource_name}/subject=*"
 
   depends_on = [ 
-    confluent_service_account.sandbox_src_api,
-    data.confluent_schema_registry_cluster.sandbox_src
+    confluent_service_account.src_api,
+    data.confluent_schema_registry_cluster.src
   ]
 }
 
 resource "confluent_role_binding" "schema_registry_developer_write_all_subjects" {
-  principal   = "User:${confluent_service_account.sandbox_src_api.id}"
+  principal   = "User:${confluent_service_account.src_api.id}"
   role_name   = "DeveloperWrite"
-  crn_pattern = "${data.confluent_schema_registry_cluster.sandbox_src.resource_name}/subject=*"
+  crn_pattern = "${data.confluent_schema_registry_cluster.src.resource_name}/subject=*"
 
   depends_on = [ 
-    confluent_service_account.sandbox_src_api,
-    data.confluent_schema_registry_cluster.sandbox_src
+    confluent_service_account.src_api,
+    data.confluent_schema_registry_cluster.src
   ]
 }

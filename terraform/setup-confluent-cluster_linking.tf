@@ -6,7 +6,7 @@ resource "confluent_service_account" "sandbox_cluster_linking_app_manager" {
 resource "confluent_role_binding" "sandbox_cluster_linking_app_manager" {
   principal   = "User:${confluent_service_account.sandbox_cluster_linking_app_manager.id}"
   role_name   = "EnvironmentAdmin"
-  crn_pattern = confluent_environment.sandbox.resource_name
+  crn_pattern = confluent_environment.non_prod.resource_name
 }
 
 module "sandbox_cluster_linking_app_manager_api_key" {
@@ -25,7 +25,7 @@ module "sandbox_cluster_linking_app_manager_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -48,7 +48,7 @@ resource "confluent_service_account" "shared_cluster_linking_app_manager" {
 resource "confluent_role_binding" "shared_cluster_linking_app_manager" {
   principal   = "User:${confluent_service_account.shared_cluster_linking_app_manager.id}"
   role_name   = "EnvironmentAdmin"
-  crn_pattern = confluent_environment.shared.resource_name
+  crn_pattern = confluent_environment.non_prod.resource_name
 }
 
 module "shared_cluster_linking_app_manager_api_key" {
@@ -67,7 +67,7 @@ module "shared_cluster_linking_app_manager_api_key" {
     kind        = confluent_kafka_cluster.shared_cluster.kind
 
     environment = {
-      id = confluent_environment.shared.id
+      id = confluent_environment.non_prod.id
     }
   }
 

@@ -190,3 +190,23 @@ resource "aws_security_group_rule" "allow_kafka" {
   cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
+
+resource "aws_security_group_rule" "allow_dns_udp" {
+  description       = "DNS (UDP) from VPC, TFC Agent VPCs, and VPN clients"
+  type              = "ingress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "udp"
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  security_group_id = aws_security_group.privatelink.id
+}
+
+resource "aws_security_group_rule" "allow_dns_tcp" {
+  description       = "DNS (TCP) from VPC, TFC Agent VPCs, and VPN clients"
+  type              = "ingress"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "tcp"
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  security_group_id = aws_security_group.privatelink.id
+}

@@ -7,7 +7,7 @@ resource "confluent_kafka_cluster" "sandbox_cluster" {
   enterprise   {}
   
   environment {
-    id = confluent_environment.sandbox.id
+    id = confluent_environment.non_prod.id
   }
 }
 
@@ -46,7 +46,7 @@ module "kafka_sandbox_cluster_app_manager_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -99,7 +99,7 @@ module "kafka_sandbox_cluster_app_consumer_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -163,7 +163,7 @@ module "kafka_sandbox_cluster_app_producer_api_key" {
     kind        = confluent_kafka_cluster.sandbox_cluster.kind
 
     environment = {
-      id = confluent_environment.sandbox.id
+      id = confluent_environment.non_prod.id
     }
   }
 
@@ -317,7 +317,7 @@ resource "confluent_kafka_acl" "sandbox_cluster_app_connector_write_on_data_prev
 
 resource "confluent_connector" "source" {
   environment {
-    id = confluent_environment.sandbox.id
+    id = confluent_environment.non_prod.id
   }
   kafka_cluster {
     id = confluent_kafka_cluster.sandbox_cluster.id
@@ -327,13 +327,17 @@ resource "confluent_connector" "source" {
 
   config_nonsensitive = {
     "connector.class"          = "DatagenSource"
-    "name"                     = "sanbox_aws_privatelink_example_source_datagen_connector"
+    "name"                     = "sandbox_aws_privatelink_example_source_datagen_connector"
     "kafka.auth.mode"          = "SERVICE_ACCOUNT"
     "kafka.service.account.id" = confluent_service_account.sandbox_cluster_app_connector.id
     "kafka.topic"              = confluent_kafka_topic.source_stock_trades.topic_name
     "output.data.format"       = "AVRO"
     "quickstart"               = "STOCK_TRADES"
     "tasks.max"                = "1"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   depends_on = [
