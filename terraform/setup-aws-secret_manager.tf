@@ -1,14 +1,14 @@
 # Create the Schema Registry Cluster Secrets: API Key Pair and REST endpoint for Kafka client
-resource "aws_secretsmanager_secret" "schema_registry_cluster_api_key" {
+resource "aws_secretsmanager_secret" "src_api_key" {
     name = "${var.confluent_secret_root_path}/schema_registry_cluster"
     description = "Schema Registry Cluster secrets for Kafka client"
 }
 
-resource "aws_secretsmanager_secret_version" "schema_registry_cluster_api_key" {
-    secret_id     = aws_secretsmanager_secret.schema_registry_cluster_api_key.id
+resource "aws_secretsmanager_secret_version" "src_api_key" {
+    secret_id     = aws_secretsmanager_secret.src_api_key.id
     secret_string = jsonencode({"schema.registry.basic.auth.credentials.source": "USER_INFO",
-                                "schema.registry.basic.auth.user.info": "${module.schema_registry_cluster_api_key_rotation.active_api_key.id}:${module.schema_registry_cluster_api_key_rotation.active_api_key.secret}",
-                                "schema.registry.url": "${data.confluent_schema_registry_cluster.aws_privatelink_example.rest_endpoint}"})
+                                "schema.registry.basic.auth.user.info": "${module.src_api_key_rotation.active_api_key.id}:${module.src_api_key_rotation.active_api_key.secret}",
+                                "schema.registry.url": "${data.confluent_schema_registry_cluster.src.rest_endpoint}"})
 }
 
 # Create the Kafka Cluster Secrets: JAAS (Java Authentication and Authorization) representation

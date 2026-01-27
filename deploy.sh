@@ -304,7 +304,7 @@ deploy_infrastructure() {
 
     # Plan
     print_info "Running Terraform plan..."
-    terraform plan -out=tfplan
+    terraform plan -out=tfplan -refresh=false > tfplan.out
     
     # Apply
     read -p "Do you want to apply this plan? (y/N) " -n 1 -r
@@ -313,7 +313,7 @@ deploy_infrastructure() {
         print_info "Applying Terraform plan..."
 
         # Stage 3 Apply: Apply the rest of the infrastructure
-        terraform apply tfplan
+        terraform apply tfplan 
         rm tfplan
         print_info "Infrastructure deployed successfully!"
 

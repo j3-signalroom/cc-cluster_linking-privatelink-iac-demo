@@ -55,7 +55,9 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Ignore plan output files
 tfplan
+*.out
 
 # ==========================================
 # AWS & Cloud

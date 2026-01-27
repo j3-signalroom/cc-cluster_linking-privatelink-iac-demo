@@ -84,9 +84,3 @@ variable "shared_phz_id" {
   type        = string
   default     = null
 }
-
-variable "create_phz" {
-  type        = bool
-  description = "Whether to create a new PHZ or use existing"
-  default     = true
-}
