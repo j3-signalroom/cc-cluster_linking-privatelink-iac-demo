@@ -165,3 +165,9 @@ variable "vpn_client_vpc_rt_ids" {
     "rtb-0a872eae8a88644af"
   ]
 }
+
+variable "dns_vpc_cidr" {
+  description = "DNS VPC CIDR"
+  type        = string
+  default     = "10.255.0.0/24"
+}

@@ -73,3 +73,8 @@ variable "shared_phz_id" {
   type        = string
   default     = null
 }
+
+variable "dns_vpc_cidr" {
+  description = "DNS VPC CIDR"
+  type        = string
+}

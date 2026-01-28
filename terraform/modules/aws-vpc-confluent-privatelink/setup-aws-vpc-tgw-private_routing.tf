@@ -97,3 +97,16 @@ resource "aws_route" "privatelink_to_vpn_client" {
     aws_ec2_transit_gateway_vpc_attachment.privatelink
   ]
 }
+
+# Add route to DNS VPC via Transit Gateway
+resource "aws_route" "privatelink_to_dns" {
+  count = var.subnet_count
+  
+  route_table_id         = aws_route_table.private[count.index].id
+  destination_cidr_block = var.dns_vpc_cidr
+  transit_gateway_id     = var.tgw_id
+
+  depends_on = [
+    aws_ec2_transit_gateway_vpc_attachment.privatelink
+  ]
+}

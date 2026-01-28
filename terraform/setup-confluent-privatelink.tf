@@ -29,6 +29,9 @@ module "sandbox_vpc_privatelink" {
   tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
   tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
 
+  # DNS configuration
+  dns_vpc_cidr             = var.dns_vpc_cidr
+
   # Use shared PHZ
   shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
 
@@ -67,6 +70,9 @@ module "shared_vpc_privatelink" {
   # Terraform Cloud Agent configuration
   tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
   tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
+
+  # DNS configuration
+  dns_vpc_cidr             = var.dns_vpc_cidr
 
   # Use shared PHZ
   shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
