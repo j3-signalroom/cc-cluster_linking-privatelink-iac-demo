@@ -143,7 +143,7 @@ resource "aws_route" "vpn_to_shared_privatelink" {
 # ===================================================================================
 #
 # Zonal records for Sandbox
-resource "aws_route53_record" "sandbox_zonal" {
+resource "aws_route53_record" "privatelink_zonal" {
   for_each = module.sandbox_vpc_privatelink.vpc_subnet_details
   
   zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
@@ -163,56 +163,21 @@ resource "aws_route53_record" "sandbox_zonal" {
     )
   ]
   
-  depends_on = [module.sandbox_vpc_privatelink]
+  depends_on = [
+    module.sandbox_vpc_privatelink
+  ]
 }
 
 # Wildcard record for Sandbox
-resource "aws_route53_record" "sandbox_wildcard" {
+resource "aws_route53_record" "privatelink_wildcard" {
   zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
   name    = "*.${confluent_private_link_attachment.non_prod.dns_domain}"
   type    = "CNAME"
   ttl     = 60
   records = [module.sandbox_vpc_privatelink.vpc_endpoint_dns]
   
-  depends_on = [module.sandbox_vpc_privatelink]
-}
-
-# Zonal records for Shared
-resource "aws_route53_record" "shared_zonal" {
-  for_each = module.shared_vpc_privatelink.vpc_subnet_details
-  
-  zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
-  name    = "*.${each.value.availability_zone_id}.${confluent_private_link_attachment.non_prod.dns_domain}"
-  type    = "CNAME"
-  ttl     = 60
-  
-  records = [
-    format("%s-%s%s",
-      split(".", module.shared_vpc_privatelink.vpc_endpoint_dns)[0],
-      each.value.availability_zone,
-      replace(
-        module.shared_vpc_privatelink.vpc_endpoint_dns,
-        split(".", module.shared_vpc_privatelink.vpc_endpoint_dns)[0],
-        ""
-      )
-    )
-  ]
-  
   depends_on = [
-    module.shared_vpc_privatelink
-  ]
-}
-
-# Wildcard record for Shared
-resource "aws_route53_record" "shared_wildcard" {
-  zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
-  name    = "*.${confluent_private_link_attachment.non_prod.dns_domain}"
-  type    = "CNAME"
-  ttl     = 60
-  records = [module.shared_vpc_privatelink.vpc_endpoint_dns]
-  
-  depends_on = [
-    module.shared_vpc_privatelink
+    module.sandbox_vpc_privatelink
   ]
 }
 
@@ -305,10 +270,8 @@ resource "aws_route53_resolver_rule_association" "confluent_private_shared_vpc" 
 # ===================================================================================
 resource "time_sleep" "wait_for_dns" {
   depends_on = [
-    aws_route53_record.sandbox_zonal,
-    aws_route53_record.sandbox_wildcard,
-    aws_route53_record.shared_zonal,
-    aws_route53_record.shared_wildcard,
+    aws_route53_record.privatelink_zonal,
+    aws_route53_record.privatelink_wildcard,
     aws_route.tfc_agent_to_sandbox_privatelink,
     aws_route.tfc_agent_to_shared_privatelink,
     aws_route.vpn_to_sandbox_privatelink,
