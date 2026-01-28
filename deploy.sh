@@ -16,6 +16,7 @@
 #                                --dns-vpc-id=<DNS_VPC_ID>
 #                                --vpn-client-vpc-cidr=<VPN_CLIENT_VPC_CIDR>
 #                                --vpn-vpc-cidr=<VPN_VPC_CIDR>
+#                                [--dns-vpc-cidr=<DNS_VPC_CIDR>]
 #                                [--day-count=<DAY_COUNT>]
 #
 #
@@ -83,6 +84,7 @@ tfc_agent_vpc_cidr=""
 dns_vpc_id=""
 vpn_client_vpc_cidr=""
 vpn_vpc_cidr=""
+dns_vpc_cidr="10.255.0.0/24"
 
 # Default optional variable(s)
 day_count=30
@@ -131,6 +133,9 @@ do
         *"--day-count="*)
             arg_length=12
             day_count=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
+        *"--dns-vpc-cidr="*)
+            arg_length=15
+            dns_vpc_cidr=${arg:$arg_length:$(expr ${#arg} - $arg_length)};;
     esac
 done
 
@@ -276,6 +281,7 @@ deploy_infrastructure() {
     # \nday_count=${day_count}\
     # \nvpn_client_vpc_cidr=\"${vpn_client_vpc_cidr}\"\
     # \nvpn_vpc_cidr=\"${vpn_vpc_cidr}\"\
+    # \ndns_vpc_cidr=\"${dns_vpc_cidr}\"\
     # \ntgw_id=\"${tgw_id}\"
     # \ntgw_rt_id=\"${tgw_rt_id}\"" > terraform.tfvars
 
@@ -296,7 +302,7 @@ deploy_infrastructure() {
     export TF_VAR_vpn_vpc_cidr="${vpn_vpc_cidr}"
     export TF_VAR_tgw_id="${tgw_id}"
     export TF_VAR_tgw_rt_id="${tgw_rt_id}"
-
+    export TF_VAR_dns_vpc_cidr="${dns_vpc_cidr}"
 
     # Initialize Terraform if needed
     print_info "Initializing Terraform..."
@@ -356,6 +362,7 @@ undeploy_infrastructure() {
     export TF_VAR_vpn_vpc_cidr="${vpn_vpc_cidr}"
     export TF_VAR_tgw_id="${tgw_id}"
     export TF_VAR_tgw_rt_id="${tgw_rt_id}"
+    export TF_VAR_dns_vpc_cidr="${dns_vpc_cidr}"
 
     # Destroy
     print_info "Running Terraform destroy..."
