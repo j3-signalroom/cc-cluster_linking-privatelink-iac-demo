@@ -1,16 +1,16 @@
 # VPC Endpoint
 resource "aws_vpc_endpoint" "privatelink" {
-  vpc_id              = var.vpc_id
+  vpc_id              = aws_vpc.privatelink.id
   service_name        = var.privatelink_service_name
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.privatelink.id]
   private_dns_enabled = false
   
-  subnet_ids = [for subnet in var.vpc_subnet_details : subnet.id]
+  subnet_ids = aws_subnet.private[*].id
   
   tags = {
     Name        = "ccloud-privatelink-${local.network_id}"
-    VPC         = var.vpc_id
+    VPC         = aws_vpc.privatelink.id
     Domain      = var.dns_domain
     Environment = data.confluent_environment.privatelink.display_name
   }
@@ -40,7 +40,7 @@ locals {
 # Associate the PHZ with the local VPC (only if using existing PHZ AND not TFC agent VPC)
 resource "aws_route53_zone_association" "local_vpc" {
   zone_id = local.shared_phz_id
-  vpc_id  = var.vpc_id
+  vpc_id  = aws_vpc.privatelink.id
 }
 
 # Wait for DNS propagation
@@ -76,15 +76,15 @@ resource "confluent_private_link_attachment_connection" "privatelink" {
 # TRANSIT GATEWAY ATTACHMENT
 # ============================================================================
 resource "aws_ec2_transit_gateway_vpc_attachment" "privatelink" {
-  subnet_ids         = [for subnet in var.vpc_subnet_details : subnet.id]
+  subnet_ids         = aws_subnet.private[*].id
   transit_gateway_id = var.tgw_id
-  vpc_id             = var.vpc_id
+  vpc_id             = aws_vpc.privatelink.id
   
   # Enable DNS support for cross-VPC resolution
   dns_support = "enable"
 
   tags = {
-    Name        = "${var.vpc_id}-ccloud-privatelink-tgw-attachment"
+    Name        = "${aws_vpc.privatelink.id}-ccloud-privatelink-tgw-attachment"
     Environment = data.confluent_environment.privatelink.display_name
     ManagedBy   = "Terraform Cloud"
     Purpose     = "Confluent PrivateLink connectivity"
@@ -108,9 +108,7 @@ resource "aws_ec2_transit_gateway_route_table_propagation" "privatelink" {
 #
 # Add route to TFC Agent VPC via Transit Gateway
 resource "aws_route" "privatelink_to_tfc_agent" {
-  for_each = toset(var.vpc_rt_ids)
-  
-  route_table_id         = each.value
+  route_table_id         = aws_route_table.private.id
   destination_cidr_block = var.tfc_agent_vpc_cidr
   transit_gateway_id     = var.tgw_id
 
@@ -121,9 +119,7 @@ resource "aws_route" "privatelink_to_tfc_agent" {
 
 # Add route to VPN clients via Transit Gateway
 resource "aws_route" "privatelink_to_vpn_client" {
-  for_each = toset(var.vpc_rt_ids)
-  
-  route_table_id         = each.value
+  route_table_id         = aws_route_table.private.id
   destination_cidr_block = var.vpn_client_vpc_cidr
   transit_gateway_id     = var.tgw_id
 
@@ -136,9 +132,9 @@ resource "aws_route" "privatelink_to_vpn_client" {
 # SECURITY GROUP RULES FOR THE VPC
 # ============================================================================
 resource "aws_security_group" "privatelink" {
-  name        = "ccloud-privatelink_${local.network_id}_${var.vpc_id}"
+  name        = "ccloud-privatelink_${local.network_id}_${aws_vpc.privatelink.id}"
   description = "Confluent Cloud Private Link Security Group for ${var.dns_domain}"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.privatelink.id
 
   lifecycle {
     create_before_destroy = true
@@ -146,7 +142,7 @@ resource "aws_security_group" "privatelink" {
   
   tags = {
     Name        = "ccloud-privatelink-${local.network_id}"
-    VPC         = var.vpc_id
+    VPC         = aws_vpc.privatelink.id
     Environment = data.confluent_environment.privatelink.display_name
   }
 }

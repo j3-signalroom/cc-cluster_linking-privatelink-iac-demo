@@ -1,13 +1,36 @@
 # ===================================================================================
-# SANDBOX AWS VPC WITH TGW INTEGRATION CREATION
+# SANDBOX VPC AND PRIVATELINK CONFIGURATION
 # ===================================================================================
-module "sandbox_vpc" {
-  source = "./modules/aws-vpc"
-  
+module "sandbox_vpc_privatelink" {
+  source = "./modules/aws-vpc-confluent-privatelink"
+
   vpc_name          = "sandbox-${confluent_environment.non_prod.display_name}"
   vpc_cidr          = "10.0.0.0/20"
   subnet_count      = 3
   new_bits          = 4
+  
+  # Transit Gateway configuration
+  tgw_id                   = var.tgw_id
+  tgw_rt_id                = var.tgw_rt_id
+
+  # PrivateLink configuration from Confluent
+  privatelink_service_name = confluent_private_link_attachment.non_prod.aws[0].vpc_endpoint_service_name
+  dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
+  
+  # VPN configuration
+  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr             = var.vpn_vpc_cidr
+
+  # Confluent Cloud configuration
+  confluent_environment_id = confluent_environment.non_prod.id
+  confluent_platt_id       = confluent_private_link_attachment.non_prod.id
+
+  # Terraform Cloud Agent configuration
+  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
+  tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
+
+  # Use shared PHZ
+  shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
 
   depends_on = [ 
     confluent_environment.non_prod 
@@ -15,98 +38,41 @@ module "sandbox_vpc" {
 }
 
 # ===================================================================================
-# SHARED AWS VPC WITH TGW INTEGRATION CREATION
+# SHARED VPC AND PRIVATELINK CONFIGURATION
 # ===================================================================================
-module "shared_vpc" {
-  source = "./modules/aws-vpc"
-  
+module "shared_vpc_privatelink" {
+  source = "./modules/aws-vpc-confluent-privatelink"
+
   vpc_name          = "shared-${confluent_environment.non_prod.display_name}"
   vpc_cidr          = "10.1.0.0/20"
   subnet_count      = 3
   new_bits          = 4
+  
+  # Transit Gateway configuration
+  tgw_id                   = var.tgw_id
+  tgw_rt_id                = var.tgw_rt_id
+
+  # PrivateLink configuration from Confluent
+  privatelink_service_name = confluent_private_link_attachment.non_prod.aws[0].vpc_endpoint_service_name
+  dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
+  
+  # VPN configuration
+  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr             = var.vpn_vpc_cidr
+
+  # Confluent Cloud configuration
+  confluent_environment_id = confluent_environment.non_prod.id
+  confluent_platt_id       = confluent_private_link_attachment.non_prod.id
+
+  # Terraform Cloud Agent configuration
+  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
+  tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
+
+  # Use shared PHZ
+  shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
 
   depends_on = [ 
     confluent_environment.non_prod
-  ]
-}
-
-# ===================================================================================
-# SANDBOX PRIVATELINK MODULE
-# ===================================================================================
-module "sandbox_vpc_privatelink" {
-  source = "./modules/aws-vpc-confluent-privatelink"
-  
-  # Transit Gateway configuration
-  tgw_id                   = var.tgw_id
-  tgw_rt_id                = var.tgw_rt_id
-
-  # PrivateLink configuration from Confluent
-  privatelink_service_name = confluent_private_link_attachment.non_prod.aws[0].vpc_endpoint_service_name
-  dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
-  
-  # AWS VPC configuration
-  vpc_id                   = module.sandbox_vpc.vpc_id
-  vpc_cidr                 = module.sandbox_vpc.vpc_cidr
-  vpc_subnet_details       = module.sandbox_vpc.vpc_subnet_details
-  vpc_rt_ids               = var.sandbox_vpc_rt_ids
-
-  # VPN configuration
-  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
-  vpn_vpc_cidr             = var.vpn_vpc_cidr
-
-  # Confluent Cloud configuration
-  confluent_environment_id = confluent_environment.non_prod.id
-  confluent_platt_id       = confluent_private_link_attachment.non_prod.id
-
-  # Terraform Cloud Agent configuration
-  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
-  tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
-
-  # Use shared PHZ
-  shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
-
-  depends_on = [ 
-      aws_route53_zone.centralized_dns_vpc
-  ]
-}
-
-# ===================================================================================
-# SHARED PRIVATELINK MODULE
-# ===================================================================================
-module "shared_vpc_privatelink" {
-  source = "./modules/aws-vpc-confluent-privatelink"
-  
-  # Transit Gateway configuration
-  tgw_id                   = var.tgw_id
-  tgw_rt_id                = var.tgw_rt_id
-
-  # PrivateLink configuration from Confluent
-  privatelink_service_name = confluent_private_link_attachment.non_prod.aws[0].vpc_endpoint_service_name
-  dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
-  
-  # AWS VPC configuration
-  vpc_id                   = module.shared_vpc.vpc_id
-  vpc_cidr                 = module.shared_vpc.vpc_cidr
-  vpc_subnet_details       = module.shared_vpc.vpc_subnet_details
-  vpc_rt_ids               = var.shared_vpc_rt_ids
-  
-  # VPN configuration
-  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
-  vpn_vpc_cidr             = var.vpn_vpc_cidr
-
-  # Confluent Cloud configuration
-  confluent_environment_id = confluent_environment.non_prod.id
-  confluent_platt_id       = confluent_private_link_attachment.non_prod.id
-
-  # Terraform Cloud Agent configuration
-  tfc_agent_vpc_id         = var.tfc_agent_vpc_id 
-  tfc_agent_vpc_cidr       = var.tfc_agent_vpc_cidr
-
-  # Use shared PHZ
-  shared_phz_id            = aws_route53_zone.centralized_dns_vpc.zone_id
-
-  depends_on = [ 
-    aws_route53_zone.centralized_dns_vpc
   ]
 }
 
@@ -172,7 +138,7 @@ resource "aws_route" "vpn_to_shared_privatelink" {
 #
 # Zonal records for Sandbox
 resource "aws_route53_record" "sandbox_zonal" {
-  for_each = module.sandbox_vpc.vpc_subnet_details
+  for_each = module.sandbox_vpc_privatelink.vpc_subnet_details
   
   zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
   name    = "*.${each.value.availability_zone_id}.${confluent_private_link_attachment.non_prod.dns_domain}"
@@ -207,7 +173,7 @@ resource "aws_route53_record" "sandbox_wildcard" {
 
 # Zonal records for Shared
 resource "aws_route53_record" "shared_zonal" {
-  for_each = module.shared_vpc.vpc_subnet_details
+  for_each = module.shared_vpc_privatelink.vpc_subnet_details
   
   zone_id = aws_route53_zone.centralized_dns_vpc.zone_id
   name    = "*.${each.value.availability_zone_id}.${confluent_private_link_attachment.non_prod.dns_domain}"
@@ -316,6 +282,17 @@ resource "aws_route53_resolver_rule_association" "confluent_private_tfc_vpc" {
   name             = "tfc-vpc-confluent-private"
 }
 
+resource "aws_route53_resolver_rule_association" "confluent_private_sandbox_vpc" {
+  resolver_rule_id = aws_route53_resolver_rule.confluent_private_system.id
+  vpc_id           = module.sandbox_vpc_privatelink.vpc_id
+  name             = "sandbox-vpc-confluent-private"
+}
+
+resource "aws_route53_resolver_rule_association" "confluent_private_shared_vpc" {
+  resolver_rule_id = aws_route53_resolver_rule.confluent_private_system.id
+  vpc_id           = module.shared_vpc_privatelink.vpc_id
+  name             = "shared-vpc-confluent-private"
+}
 
 # ===================================================================================
 # WAIT FOR DNS PROPAGATION

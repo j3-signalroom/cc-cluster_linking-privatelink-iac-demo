@@ -19,16 +19,16 @@ output "verification" {
     sandbox = {
       environment_id  = confluent_environment.non_prod.id
       dns_domain      = confluent_private_link_attachment.non_prod.dns_domain
-      vpc_id          = module.sandbox_vpc.vpc_id
-      vpc_cidr        = module.sandbox_vpc.vpc_cidr
+      vpc_id          = module.sandbox_vpc_privatelink.vpc_id
+      vpc_cidr        = module.sandbox_vpc_privatelink.vpc_cidr
       endpoint_id     = module.sandbox_vpc_privatelink.vpc_endpoint_id
       phz_id          = aws_route53_zone.centralized_dns_vpc.zone_id
     }
     shared = {
       environment_id  = confluent_environment.non_prod.id
       dns_domain      = confluent_private_link_attachment.non_prod.dns_domain
-      vpc_id          = module.shared_vpc.vpc_id
-      vpc_cidr        = module.shared_vpc.vpc_cidr
+      vpc_id          = module.shared_vpc_privatelink.vpc_id
+      vpc_cidr        = module.shared_vpc_privatelink.vpc_cidr
       endpoint_id     = module.shared_vpc_privatelink.vpc_endpoint_id
       phz_id          = aws_route53_zone.centralized_dns_vpc.zone_id
     }

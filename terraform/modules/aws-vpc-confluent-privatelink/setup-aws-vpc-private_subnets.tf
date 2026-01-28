@@ -26,7 +26,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.privatelink.id
 
   tags = {
-    Name        = "${var.vpc_name}-private-rt"
+    Name = "${var.vpc_name}-private-rt"
   }
 }
 

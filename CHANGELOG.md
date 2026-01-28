@@ -18,6 +18,7 @@ The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 - Issue [`#111`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/111)
 - Issue [`#136`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/136)
 - Issue [`#139`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/139)
+- Issue [`#141`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/141)
 
 ### Fixed
 - Issue [`#115`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/115)

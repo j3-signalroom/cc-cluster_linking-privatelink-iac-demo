@@ -1,3 +1,23 @@
+variable "vpc_cidr" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "vpc_name" {
+  description = "VPC name"
+  type        = string
+}
+
+variable "subnet_count" {
+  description = "Number of subnets to create"
+  type        = number
+}
+
+variable "new_bits" {
+    description = "New bit"
+    type = number
+}
+
 variable "privatelink_service_name" {
   description = "AWS VPC Endpoint Service Name from Confluent Private Link Attachment"
   type        = string
@@ -26,37 +46,6 @@ variable "tgw_id" {
 variable "tgw_rt_id" {
   description = "Transit Gateway Route Table ID to associate the PrivateLink VPC attachment with"
   type        = string
-}
-
-variable "vpc_id" {
-  description = "VPC ID where the VPC endpoint will be created"
-  type        = string
-  
-  validation {
-    condition     = can(regex("^vpc-[a-f0-9]+$", var.vpc_id))
-    error_message = "VPC ID must be valid format (vpc-xxxxxxxxx)"
-  }
-}
-
-variable "vpc_cidr" {
-  description = "VPC CIDR"
-  type        = string
-}
-
-variable "vpc_rt_ids" {
-  description = "List of VPC Route Table IDs to add routes to for Transit Gateway connectivity"
-  type        = list(string)
-}
-
-variable "vpc_subnet_details" {
-  description = "Map of AZ names to subnet IDs for the VPC endpoint"
-  type        = map(object({
-    id                   = string
-    cidr_block           = string
-    availability_zone    = string
-    availability_zone_id = string
-    name                 = string
-  }))
 }
 
 variable "vpn_client_vpc_cidr" {
