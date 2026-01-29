@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.05.00.000] - TBD
+## [0.05.00.000] - 2026-01-28
 ### Added
 - Issue [`#103`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/103)
 - Issue [`#113`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/113)
 - Issue [`#127`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/127)
+- Issue [`#146`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/146)
 
 ### Changed
 - Issue [`#99`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/99)

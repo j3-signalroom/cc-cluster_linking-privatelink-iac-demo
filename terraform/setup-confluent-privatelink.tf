@@ -18,8 +18,8 @@ module "sandbox_vpc_privatelink" {
   dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
   
   # VPN configuration
-  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
-  vpn_vpc_cidr             = var.vpn_vpc_cidr
+  vpn_client_vpc_cidr = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr        = var.vpn_vpc_cidr
 
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
@@ -60,9 +60,9 @@ module "shared_vpc_privatelink" {
   dns_domain               = confluent_private_link_attachment.non_prod.dns_domain
   
   # VPN configuration
-  vpn_client_vpc_cidr      = var.vpn_client_vpc_cidr
-  vpn_vpc_cidr             = var.vpn_vpc_cidr
-
+  vpn_client_vpc_cidr = var.vpn_client_vpc_cidr
+  vpn_vpc_cidr        = var.vpn_vpc_cidr
+  
   # Confluent Cloud configuration
   confluent_environment_id = confluent_environment.non_prod.id
   confluent_platt_id       = confluent_private_link_attachment.non_prod.id

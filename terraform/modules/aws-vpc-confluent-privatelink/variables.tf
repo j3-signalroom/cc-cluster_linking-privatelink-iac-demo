@@ -53,11 +53,6 @@ variable "vpn_client_vpc_cidr" {
   type        = string
 }
 
-variable "vpn_vpc_cidr" {
-  description = "VPN VPC CIDR"
-  type        = string
-}
-
 variable "tfc_agent_vpc_id" {
   description = "Terraform Cloud Agent VPC ID (for tagging PHZ association purposes)"
   type        = string
@@ -76,5 +71,10 @@ variable "shared_phz_id" {
 
 variable "dns_vpc_cidr" {
   description = "DNS VPC CIDR"
+  type        = string
+}
+
+variable "vpn_vpc_cidr" {
+  description = "VPN VPC CIDR"
   type        = string
 }
