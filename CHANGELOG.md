@@ -5,6 +5,9 @@ The format is base on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 
 
 ## [0.06.00.000] - 2026-01-29
+### Added
+- Issue [`#151`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/151)
+
 ### Changed
 - Issue [`#150`](https://github.com/j3-signalroom/cc-cluster_linking-privatelink-iac-demo/issues/150)
 
