@@ -7,5 +7,6 @@ locals {
 }
 
 locals {
+  tfc_agent_vpc_rt_ids = length(trimspace(var.tfc_agent_vpc_rt_ids)) > 0 ? split(",", var.tfc_agent_vpc_rt_ids) : []
   acl_operations = ["READ", "WRITE", "DESCRIBE"]
 }

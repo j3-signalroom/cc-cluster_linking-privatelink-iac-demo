@@ -88,7 +88,7 @@ module "shared_vpc_privatelink" {
 #
 # Routes from TFC Agent VPC to Sandbox VPC
 resource "aws_route" "tfc_agent_to_sandbox_privatelink" {
-  for_each = toset(var.tfc_agent_vpc_rt_ids)
+  for_each = toset(local.tfc_agent_vpc_rt_ids)
   
   route_table_id         = each.value
   destination_cidr_block = "10.0.0.0/20"
@@ -101,7 +101,7 @@ resource "aws_route" "tfc_agent_to_sandbox_privatelink" {
 
 # Routes from TFC Agent VPC to Shared VPC
 resource "aws_route" "tfc_agent_to_shared_privatelink" {
-  for_each = toset(var.tfc_agent_vpc_rt_ids)
+  for_each = toset(local.tfc_agent_vpc_rt_ids)
   
   route_table_id         = each.value
   destination_cidr_block = "10.1.0.0/20"

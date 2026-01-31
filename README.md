@@ -22,9 +22,12 @@ Below is the Terraform resource visualization of the infrastructure that's creat
     - [**1.1 Client VPN, Centralized DNS Server, and Transit Gateway**](#11-client-vpn-centralized-dns-server-and-transit-gateway)
     - [**1.2 Terraform Cloud Agent**](#12-terraform-cloud-agent)
 + [**2.0 Project's Architecture Overview**](#20-projects-architecture-overview)
-+ [**3.0 Resources**](#30-resources)
-    - [**3.1 Terminology**](#31-terminology)
-    - [**3.2 Related Documentation**](#32-related-documentation)
++ [**3.0 Let's Get Started**](#30-lets-get-started)
+    - [**3.1 Deploying the Infrastructure**](#31-deploying-the-infrastructure)
+    - [**3.2 Destroying the Infrastructure**](#32-destroying-the-infrastructure)
++ [**4.0 Resources**](#40-resources)
+    - [**4.1 Terminology**](#41-terminology)
+    - [**4.2 Related Documentation**](#42-related-documentation)
 <!-- tocstop -->
 
 ## **1.0 Prerequisites**
@@ -132,9 +135,72 @@ The diagram illustrates:
 3. Traffic routes through Transit Gateway to appropriate PrivateLink VPC
 4. VPC Endpoint forwards to Confluent Cloud via AWS PrivateLink
 
-## **3.0 Resources**
+## **3.0 Let's Get Started**
 
-### **3.1 Terminology**
+### **3.1 Deploying the Infrastructure**
+
+### **3.2 Destroying the Infrastructure**
+
+```bash
+╷
+│ Error: error deleting Kafka ACLs "lkc-j6wj9w/TOPIC#sandbox_aws_privatelink_example_#LITERAL#User:sa-w7xo5n9#*#CREATE#ALLOW": Delete "https://lkc-j6wj9w.us-east-1.aws.private.confluent.cloud:443/kafka/v3/clusters/lkc-j6wj9w/acls?host=%2A&operation=CREATE&pattern_type=LITERAL&permission=ALLOW&principal=User%3Asa-w7xo5n9&resource_name=sandbox_aws_privatelink_example_&resource_type=TOPIC": dial tcp: lookup lkc-j6wj9w.us-east-1.aws.private.confluent.cloud on 10.2.0.2:53: no such host
+│ 
+│ 
+╵
+╷
+│ Error: error deleting Kafka ACLs "lkc-j6wj9w/TOPIC#sandbox_aws_privatelink_example_#LITERAL#User:sa-w7xo5n9#*#WRITE#ALLOW": Delete "https://lkc-j6wj9w.us-east-1.aws.private.confluent.cloud:443/kafka/v3/clusters/lkc-j6wj9w/acls?host=%2A&operation=WRITE&pattern_type=LITERAL&permission=ALLOW&principal=User%3Asa-w7xo5n9&resource_name=sandbox_aws_privatelink_example_&resource_type=TOPIC": dial tcp: lookup lkc-j6wj9w.us-east-1.aws.private.confluent.cloud on 10.2.0.2:53: no such host
+│ 
+│ 
+╵
+╷
+│ Error: error deleting Kafka ACLs "lkc-j6wj9w/CLUSTER#kafka-cluster#LITERAL#User:sa-w7xo5n9#*#DESCRIBE#ALLOW": Delete "https://lkc-j6wj9w.us-east-1.aws.private.confluent.cloud:443/kafka/v3/clusters/lkc-j6wj9w/acls?host=%2A&operation=DESCRIBE&pattern_type=LITERAL&permission=ALLOW&principal=User%3Asa-w7xo5n9&resource_name=kafka-cluster&resource_type=CLUSTER": dial tcp: lookup lkc-j6wj9w.us-east-1.aws.private.confluent.cloud on 10.2.0.2:53: no such host
+│ 
+│ 
+╵
+╷
+│ Error: error waiting for Kafka Mirror Topic "lkc-99gmp5/bidirectional-between-sandbox-and-shared/dev-stock_trades" to be deleted: Get "https://lkc-99gmp5.us-east-1.aws.private.confluent.cloud:443/kafka/v3/clusters/lkc-99gmp5/links/bidirectional-between-sandbox-and-shared/mirrors/dev-stock_trades": dial tcp: lookup lkc-99gmp5.us-east-1.aws.private.confluent.cloud on 10.2.0.2:53: no such host; could not parse error details; raw response body: ""
+│ 
+│ 
+╵
+╷
+│ Error: error deleting Kafka ACLs "lkc-j6wj9w/TOPIC#dev-stock_trades#LITERAL#User:sa-w7xo5n9#*#WRITE#ALLOW": Delete "https://lkc-j6wj9w.us-east-1.aws.private.confluent.cloud:443/kafka/v3/clusters/lkc-j6wj9w/acls?host=%2A&operation=WRITE&pattern_type=LITERAL&permission=ALLOW&principal=User%3Asa-w7xo5n9&resource_name=dev-stock_trades&resource_type=TOPIC": dial tcp: lookup lkc-j6wj9w.us-east-1.aws.private.confluent.cloud on 10.2.0.2:53: no such host
+│ 
+│ 
+╵
+Operation failed: failed running terraform apply (exit 1)
+```
+
+If you encounter DNS resolution errors during the destroy process, do the following:
+
+**Navigate to the Terraform directory:**
+```bash
+cd terraform
+```
+
+***Remove the unreachable resources from the Terraform state:**
+```bash
+terraform state rm 'confluent_kafka_acl.sandbox_cluster_app_connector_describe_on_cluster'
+terraform state rm 'confluent_kafka_acl.sandbox_cluster_app_connector_write_on_target_topic'
+terraform state rm 'confluent_kafka_acl.sandbox_cluster_app_connector_create_on_data_preview_topics'
+terraform state rm 'confluent_kafka_acl.sandbox_cluster_app_connector_write_on_data_preview_topics'
+terraform state rm 'confluent_cluster_link.sandbox_and_shared'
+terraform state rm 'confluent_cluster_link.shared_to_sandbox'
+terraform state rm 'confluent_kafka_topic.source_stock_trades'
+terraform state rm 'confluent_kafka_mirror_topic.stock_trades_mirror'
+```
+
+**Navigate back to the root directory:**
+```bash
+cd ..
+```
+
+**Rerun the destroy command:**
+```bash
+```
+
+## **4.0 Resources**
+
+### **4.1 Terminology**
 - **PHZ**: Private Hosted Zone - AWS Route 53 Private Hosted Zone is a DNS service that allows you to create and manage private DNS zones within your VPCs.
 - **TFC**: Terraform Cloud - A service that provides infrastructure automation using Terraform.
 - **VPC**: Virtual Private Cloud - A virtual network dedicated to your AWS account.
@@ -143,7 +209,7 @@ The diagram illustrates:
 - **PL**: PrivateLink - An AWS service that enables private connectivity between VPCs and services.
 - **IaC**: Infrastructure as Code - The practice of managing and provisioning computing infrastructure through machine-readable definition files.
 
-### **3.2 Related Documentation**
+### **4.2 Related Documentation**
 - [AWS PrivateLink Overview in Confluent Cloud](https://docs.confluent.io/cloud/current/networking/aws-privatelink-overview.html#aws-privatelink-overview-in-ccloud)
 - [Use AWS PrivateLink for Serverless Products on Confluent Cloud](https://docs.confluent.io/cloud/current/networking/aws-platt.html#use-aws-privatelink-for-serverless-products-on-ccloud)
 - [GitHub Sample Project for Confluent Terraform Provider PrivateLink Attachment](https://github.com/confluentinc/terraform-provider-confluent/tree/master/examples/configurations/enterprise-privatelinkattachment-aws-kafka-acls)
