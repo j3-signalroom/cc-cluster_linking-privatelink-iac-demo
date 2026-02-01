@@ -83,62 +83,6 @@ module "shared_vpc_privatelink" {
 }
 
 # ===================================================================================
-# TFC AGENT AND VPN VPC ROUTES TO PRIVATELINK VPCS
-# ===================================================================================
-#
-# Routes from TFC Agent VPC to Sandbox VPC
-resource "aws_route" "tfc_agent_to_sandbox_privatelink" {
-  for_each = toset(local.tfc_agent_vpc_rt_ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.0.0.0/20"
-  transit_gateway_id     = var.tgw_id
-  
-  depends_on = [
-    module.sandbox_vpc_privatelink
-  ]
-}
-
-# Routes from TFC Agent VPC to Shared VPC
-resource "aws_route" "tfc_agent_to_shared_privatelink" {
-  for_each = toset(local.tfc_agent_vpc_rt_ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.1.0.0/20"
-  transit_gateway_id     = var.tgw_id
-  
-  depends_on = [
-    module.shared_vpc_privatelink
-  ]
-}
-
-# Routes from VPN VPC to Sandbox VPC
-resource "aws_route" "vpn_to_sandbox_privatelink" {
-  for_each = toset(var.vpn_client_vpc_rt_ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.0.0.0/20"
-  transit_gateway_id     = var.tgw_id
-  
-  depends_on = [
-    module.sandbox_vpc_privatelink
-  ]
-}
-
-# Routes from VPN VPC to Shared VPC
-resource "aws_route" "vpn_to_shared_privatelink" {
-  for_each = toset(var.vpn_client_vpc_rt_ids)
-  
-  route_table_id         = each.value
-  destination_cidr_block = "10.1.0.0/20"
-  transit_gateway_id     = var.tgw_id
-  
-  depends_on = [
-    module.shared_vpc_privatelink
-  ]
-}
-
-# ===================================================================================
 # DNS RECORDS FOR SANDBOX AND SHARED VPC
 # ===================================================================================
 #
@@ -272,10 +216,6 @@ resource "time_sleep" "wait_for_dns" {
   depends_on = [
     aws_route53_record.privatelink_zonal,
     aws_route53_record.privatelink_wildcard,
-    aws_route.tfc_agent_to_sandbox_privatelink,
-    aws_route.tfc_agent_to_shared_privatelink,
-    aws_route.vpn_to_sandbox_privatelink,
-    aws_route.vpn_to_shared_privatelink,
     aws_route53_zone.centralized_dns_vpc,
     aws_route53_resolver_rule.confluent_private_system,
     aws_route53_resolver_rule_association.confluent_private_dns_vpc,

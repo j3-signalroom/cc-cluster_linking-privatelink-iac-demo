@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "allow_https" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
 
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "allow_kafka" {
   from_port         = 9092
   to_port           = 9092
   protocol          = "tcp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
 
@@ -43,7 +43,7 @@ resource "aws_security_group_rule" "allow_dns_udp" {
   from_port         = 53
   to_port           = 53
   protocol          = "udp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
 
@@ -53,6 +53,6 @@ resource "aws_security_group_rule" "allow_dns_tcp" {
   from_port         = 53
   to_port           = 53
   protocol          = "tcp"
-  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
+  cidr_blocks       = [var.tfc_agent_vpc_cidr, var.vpn_vpc_cidr, var.vpn_client_vpc_cidr, var.vpc_cidr]
   security_group_id = aws_security_group.privatelink.id
 }
