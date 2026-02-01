@@ -110,61 +110,61 @@ resource "confluent_cluster_link" "sandbox_and_shared" {
 }
 
 # Reverse link: Shared -> Sandbox (required for bidirectional mode)
-# resource "confluent_cluster_link" "shared_to_sandbox" {
-#   link_name = "bidirectional-between-sandbox-and-shared"
-#   link_mode = "BIDIRECTIONAL"
+resource "confluent_cluster_link" "shared_to_sandbox" {
+  link_name = "bidirectional-between-sandbox-and-shared"
+  link_mode = "BIDIRECTIONAL"
   
-#   local_kafka_cluster {
-#     id            = confluent_kafka_cluster.shared_cluster.id
-#     rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
-#     credentials {
-#       key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
-#       secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
-#     }
-#   }
+  local_kafka_cluster {
+    id            = confluent_kafka_cluster.shared_cluster.id
+    rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
+    credentials {
+      key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
+      secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
+    }
+  }
 
-#   remote_kafka_cluster {
-#     id                 = confluent_kafka_cluster.sandbox_cluster.id
-#     bootstrap_endpoint = confluent_kafka_cluster.sandbox_cluster.bootstrap_endpoint
-#     credentials {
-#       key    = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.id
-#       secret = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.secret
-#     }
-#   }
+  remote_kafka_cluster {
+    id                 = confluent_kafka_cluster.sandbox_cluster.id
+    bootstrap_endpoint = confluent_kafka_cluster.sandbox_cluster.bootstrap_endpoint
+    credentials {
+      key    = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.id
+      secret = module.sandbox_cluster_linking_app_manager_api_key.active_api_key.secret
+    }
+  }
 
-#   depends_on = [
-#     confluent_cluster_link.sandbox_and_shared
-#   ]
-# }
+  depends_on = [
+    confluent_cluster_link.sandbox_and_shared
+  ]
+}
 
 # Wait for Cluster Link to be active before creating reverse link
-# resource "time_sleep" "wait_for_cluster_linking" {
-#   depends_on = [
-#     confluent_cluster_link.shared_to_sandbox
-#   ]
+resource "time_sleep" "wait_for_cluster_linking" {
+  depends_on = [
+    confluent_cluster_link.shared_to_sandbox
+  ]
   
-#   create_duration = "1m"
-# }
+  create_duration = "1m"
+}
 
-# resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
-#   source_kafka_topic {
-#     topic_name = confluent_kafka_topic.source_stock_trades.topic_name 
-#   }
-#   cluster_link {
-#     link_name = confluent_cluster_link.sandbox_and_shared.link_name
-#   }
+resource "confluent_kafka_mirror_topic" "stock_trades_mirror" {
+  source_kafka_topic {
+    topic_name = confluent_kafka_topic.source_stock_trades.topic_name 
+  }
+  cluster_link {
+    link_name = confluent_cluster_link.sandbox_and_shared.link_name
+  }
   
-#   kafka_cluster {
-#     id            = confluent_kafka_cluster.shared_cluster.id
-#     rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
+  kafka_cluster {
+    id            = confluent_kafka_cluster.shared_cluster.id
+    rest_endpoint = confluent_kafka_cluster.shared_cluster.rest_endpoint
 
-#     credentials {
-#       key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
-#       secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
-#     }
-#   }
+    credentials {
+      key    = module.shared_cluster_linking_app_manager_api_key.active_api_key.id
+      secret = module.shared_cluster_linking_app_manager_api_key.active_api_key.secret
+    }
+  }
 
-#   depends_on = [
-#     time_sleep.wait_for_cluster_linking
-#   ]
-# }
+  depends_on = [
+    time_sleep.wait_for_cluster_linking
+  ]
+}
